@@ -1,0 +1,56 @@
+-- J20_COUNTS2x2 (JADER) — counts n11..n22 per DOI + overall
+-- INPUT TABLES:
+--   OAB_STD(j_id, drug_of_interest)          -- from your Python OAB normalizer
+--   AF_CASES(j_id)                            -- JADER AF cases (PT=心房細動)
+--   JADER_PLID(j_id, sex, age, drug_count)    -- from your Python PLID (already includes drug_count)
+
+WITH BASE AS (  -- mother population (one row per report)
+  SELECT DISTINCT
+         j_id,
+         sex,
+         age,
+         CASE WHEN COALESCE(drug_count, 0) >= 5 THEN '>=5' ELSE '<5' END AS poly5
+  FROM JADER_PLID
+),
+DOI_LIST AS (
+  SELECT DISTINCT drug_of_interest FROM OAB_STD
+),
+COUNTS_PER_DOI AS (
+  SELECT
+    d.drug_of_interest,
+    COUNT(DISTINCT CASE WHEN oc.j_id IS NOT NULL AND af.j_id IS NOT NULL THEN b.j_id END) AS n11,
+    COUNT(DISTINCT CASE WHEN oc.j_id IS NOT NULL AND af.j_id IS NULL THEN b.j_id END)     AS n12,
+    COUNT(DISTINCT CASE WHEN oc.j_id IS NULL AND af.j_id IS NOT NULL THEN b.j_id END)     AS n21,
+    COUNT(DISTINCT CASE WHEN oc.j_id IS NULL AND af.j_id IS NULL THEN b.j_id END)         AS n22
+  FROM BASE b
+  JOIN DOI_LIST d ON 1=1
+  LEFT JOIN OAB_STD oc ON oc.j_id = b.j_id AND oc.drug_of_interest = d.drug_of_interest
+  LEFT JOIN AF_CASES af ON af.j_id = b.j_id
+  -- exclude from background any report that contains the DOI
+  WHERE NOT EXISTS (
+    SELECT 1 FROM OAB_STD z
+    WHERE z.j_id = b.j_id
+      AND z.drug_of_interest = d.drug_of_interest
+      AND oc.j_id IS NULL
+  )
+  GROUP BY d.drug_of_interest
+),
+COUNTS_OVERALL AS (
+  SELECT
+    'Overall' AS drug_of_interest,
+    COUNT(DISTINCT CASE WHEN oc.j_id IS NOT NULL AND af.j_id IS NOT NULL THEN b.j_id END) AS n11,
+    COUNT(DISTINCT CASE WHEN oc.j_id IS NOT NULL AND af.j_id IS NULL THEN b.j_id END)     AS n12,
+    COUNT(DISTINCT CASE WHEN oc.j_id IS NULL AND af.j_id IS NOT NULL THEN b.j_id END)     AS n21,
+    COUNT(DISTINCT CASE WHEN oc.j_id IS NULL AND af.j_id IS NULL THEN b.j_id END)         AS n22
+  FROM BASE b
+  LEFT JOIN OAB_STD oc ON oc.j_id = b.j_id
+  LEFT JOIN AF_CASES  af ON af.j_id = b.j_id
+  WHERE NOT EXISTS (
+    SELECT 1 FROM OAB_STD z
+    WHERE z.j_id = b.j_id
+      AND oc.j_id IS NULL
+  )
+)
+SELECT * FROM COUNTS_PER_DOI
+UNION ALL
+SELECT * FROM COUNTS_OVERALL;
