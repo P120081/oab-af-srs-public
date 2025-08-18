@@ -2,16 +2,24 @@
 
 This repository maps every public figure/table to the exact code and inputs used.
 
-## Figure 3 — Disproportionality metrics overview
-- **Inputs**
-  - `data/derived/jader_metrics.csv`
-  - `data/derived/faers_metrics.csv`
-  - Schema (columns):  
-    `drug_of_interest, n11, n12, n21, n22, ROR, ROR025, ROR975, p, p_value, PRR, PRR025, PRR975, chi2, IC, IC025, IC975, IC_strength, met_ROR, met_PRR, met_IC`
-- **Code**
-  - Metrics generation: `raw_code/analysis/01_disproportionality.py`
-- **Notes**
-  - Rows with `n11 < 3` are excluded before pasting to Excel (as per analysis rule).
+## Figure 2 — Forest plot
+- **Input CSV columns (minimum)**  
+  `DB, drug_of_interest, n11, ROR, ROR025, ROR975`  
+  *(optional)* `p` or `p-value`, `PRR025`, `chi2` (or `χ^2`), `IC025`
+- **Code**  
+  `raw_code/plots/forest_plot.py`
+- **Output**  
+  `figure2_forest_plot.png`, `figure2_forest_plot.tif`
+- **Notes**  
+  Signals are annotated as:  
+  ROR: `ROR025>1 & p<0.05` / PRR: `PRR025>2 & chi2>4` / IC: `IC025>0`
+
+## Figure 3 — Forest plot (per drug × DB)
+- Input CSV schema: `DB, drug_of_interest, Subgroup, n11, ROR, ROR025, ROR975` (optional: `p`/`p-value`, `PRR025`, `chi2`/`χ^2`, `IC025`)
+- Code: `raw_code/plots/forest_plot_multidrug.py`
+- Output: `figure3_forest.png`, `figure3_forest.tif`
+- Signals: ROR `ROR025>1 & p<0.05`, PRR `PRR025>2 & chi2>4`, IC `IC025>0`
+
 
 ## Figure 4 — Volcano plot (per drug)
 - **Inputs**
