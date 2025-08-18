@@ -1,0 +1,18 @@
+name: reproduce
+on: [push, pull_request]
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: oab-af-srs
+          environment-file: environment.yml
+          auto-activate-base: false
+      - name: Recompute metrics and plots
+        run: |
+          python python/01_disproportionality.py
+          python python/02_volcano_plots.py
+          python python/03_tto_distributions.py
+          python python/04_km_curves.py

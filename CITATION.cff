@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: Please cite this repository if you use it.
+title: OAB-AF SRS public code (MSIP + Python)
+authors:
+  - family-names: Sagara
+    given-names: H.
+  - name: Sagara Laboratory
+abstract: >
+  MSIP node specs (pseudo-SQL) and Python code for reproducibility of
+  OAB-AF pharmacovigilance analyses across JADER and FAERS.
+repository-code: https://github.com/REPLACE_WITH_OWNER/REPLACE_WITH_REPO
+url: https://github.com/REPLACE_WITH_OWNER/REPLACE_WITH_REPO
+date-released: 2025-08-18
+license: MIT

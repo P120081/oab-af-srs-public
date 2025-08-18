@@ -1,0 +1,9 @@
+name: oab-af-srs
+channels: [conda-forge]
+dependencies:
+  - python>=3.13
+  - pandas
+  - numpy
+  - scipy
+  - matplotlib
+  - lifelines
