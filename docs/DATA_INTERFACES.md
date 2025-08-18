@@ -38,3 +38,15 @@ They are **not** tied to any specific tool. MSIP nodes, raw Python, or exported 
 
 ## Filenames when exporting to CSV (suggested)
 If you export intermediate tables for analysis:
+
+data/derived/jader_plid.csv
+data/derived/j_oab_std.csv
+data/derived/j_af.csv
+data/derived/j_counts2x2.csv
+data/derived/j_tto_candidates.csv
+
+data/derived/faers_plid.csv
+data/derived/f_oab_std.csv
+data/derived/f_af.csv
+data/derived/f_counts2x2.csv
+data/derived/f_tto_candidates.csv
