@@ -1,0 +1,8 @@
+name: oab-af-srs
+channels: [conda-forge, defaults]
+dependencies:
+  - python
+  - pandas
+  - numpy
+  - scipy
+  - matplotlib

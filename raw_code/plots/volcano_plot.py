@@ -145,7 +145,7 @@ ax.text(
 plt.tight_layout()
 
 # Save
-out_path = os.path.abspath("./volcano_plot.png")
+out_path = os.path.abspath("./fig4_solifenacin_volcano.png")
 plt.savefig(out_path, dpi=300)
 plt.close()
 
