@@ -1,0 +1,9 @@
+﻿cff-version: 1.2.0
+message: Please cite this repository if you use it.
+title: OAB-AF SRS public code (MSIP + Python)
+authors:
+  - name: Sagara Laboratory
+repository-code: https://github.com/P120081/oab-af-srs-public
+url: https://github.com/P120081/oab-af-srs-public
+date-released: 2025-08-18
+license: MIT
