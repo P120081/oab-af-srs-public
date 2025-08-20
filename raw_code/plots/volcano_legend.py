@@ -1,7 +1,7 @@
 """
 Legend-only figure for the volcano plot (MSIP Python node)
 
-- Colors: Okabe–Ito palette (JADER = Orange, FAERS = SkyBlue)
+- Colors: Okabe-Ito palette (JADER = Orange, FAERS = SkyBlue)
 - Sizes: mapped from n11 thresholds consistent with the volcano plot
 - Output: transparent PNG with just the legend (no axes)
 
@@ -22,7 +22,7 @@ import matplotlib.lines as mlines
 # Paper-ready font
 plt.rcParams["font.family"] = "Arial"
 
-# --- Okabe–Ito palette (keys align with volcano_plot.py) ---
+# --- Okabe-Ito palette (keys align with volcano_plot.py) ---
 okabe_ito_palette = {
     "Orange":  "#E69F00",
     "SkyBlue": "#56B4E9",

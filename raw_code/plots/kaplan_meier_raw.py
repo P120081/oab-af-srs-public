@@ -11,7 +11,7 @@ Assumptions
       Expect standardized generic names (e.g., "MIRABEGRON","SOLIFENACIN").
     * TTO (days): one of {"tto","days","time","time_to_onset"} or column #2 (fallback).
       Non-numeric/negative rows are dropped.
-- Four curves are drawn: JADER/FAERS × MIRABEGRON/SOLIFENACIN.
+- Four curves are drawn: JADER/FAERS x MIRABEGRON/SOLIFENACIN.
   MIRABEGRON is plotted with dash-dot line style.
 
 Output
@@ -34,18 +34,18 @@ from matplotlib.ticker import MaxNLocator
 plt.rcParams["font.family"] = "Arial"
 plt.rcParams["font.size"]   = 12
 
-# Okabe–Ito palette
+# Okabe-Ito palette
 OKABE_ITO = {
     "Orange":  "#E69F00",  # JADER
     "SkyBlue": "#56B4E9",  # FAERS
 }
 
-# Figure size: width 180 mm × height 120 mm
+# Figure size: width 180 mm x height 120 mm
 MM_TO_INCH = 1.0 / 25.4
 FIG_W = 180 * MM_TO_INCH  # 7.0866 in
 FIG_H = 120 * MM_TO_INCH  # 4.7244 in
 
-# X-range: 0–730 days
+# X-range: 0-730 days
 X_RIGHT = 730
 
 # ---------------- Load ----------------
@@ -87,7 +87,7 @@ for db_val, drug_val, color, lstyle in groups:
     t = pd.to_numeric(sub["_TTO"], errors="coerce").dropna().astype(float).values
     t = t[t >= 0]  # safety
     if t.size == 0:
-        print(f"[KM] No TTO rows for {db_val} × {drug_val}")
+        print(f"[KM] No TTO rows for {db_val} x {drug_val}")
         continue
 
     t_sorted = np.sort(t)
@@ -98,7 +98,7 @@ for db_val, drug_val, color, lstyle in groups:
     t_plot = np.insert(t_sorted, 0, 0.0)
     cum_plot = np.insert(cum, 0, 0.0)
 
-    label = f"{db_val} – {drug_val.title()}"
+    label = f"{db_val} - {drug_val.title()}"
     ax.step(t_plot, cum_plot, where="post", color=color, linestyle=lstyle, linewidth=2, label=label)
     any_curve = True
 
@@ -110,7 +110,7 @@ ax.set_ylim(0, 1.0)
 ax.grid(True, linestyle=":", linewidth=0.8)
 ax.xaxis.set_major_locator(MaxNLocator(nbins=8))
 ax.yaxis.set_major_locator(MaxNLocator(nbins=6))
-ax.legend(loc="lower right", fontsize=10, frameon=True, title="Database × Drug")
+ax.legend(loc="lower right", fontsize=10, frameon=True, title="Database x Drug")
 
 # Save (RGB)
 plt.tight_layout()

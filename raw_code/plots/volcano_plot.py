@@ -12,7 +12,7 @@ Inputs (MSIP):
 Optional columns (kept if present): n12, n21, n22, PRR, PRR025, PRR975, chi2, IC, IC025, IC975, drug_of_interest
 
 Outputs:
-- PNG file saved to working directory
+- PNG file saved to working directory as 'volcano_plot.png'
 - PNGObject returned as MSIP node result
 """
 
@@ -50,7 +50,7 @@ elif "p-value" in df.columns:
         .pipe(pd.to_numeric, errors="coerce")
     )
 
-# 2) ASCII-only Subgroup labels (normalize '≥' -> '>=')
+# 2) ASCII-only Subgroup labels (normalize '>=' already expected upstream)
 if "Subgroup" in df.columns:
     df["Subgroup"] = df["Subgroup"].astype(str).str.replace("≥", ">=")
 
@@ -105,8 +105,7 @@ for db in df["DB"].dropna().unique():
 # Label only if p < 0.05
 for _, row in df.iterrows():
     if row["p"] < 0.05:
-        label = f"{row['Subgroup']}\n({int(row['n11'])})"
-        # Note: Subgroup already normalized to '>=' above
+        label = f"{row['Subgroup']}\\n({int(row['n11'])})"
         y_offset_custom = -0.15 if row["Subgroup"] == "Drugs>=5" else y_offset
         t = ax.text(
             row["lnROR"] + x_offset,
@@ -145,7 +144,7 @@ ax.text(
 plt.tight_layout()
 
 # Save
-out_path = os.path.abspath("./fig4_solifenacin_volcano.png")
+out_path = os.path.abspath("./volcano_plot.png")
 plt.savefig(out_path, dpi=300)
 plt.close()
 
