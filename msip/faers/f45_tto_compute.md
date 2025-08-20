@@ -1,3 +1,9 @@
+﻿# FAERS — Compute TTO
+**Purpose**: Compute TTO = (event_dt - start_dt) + 1 (days).
+**Input**: F_PLID_TS(start_dt, event_dt)
+**Operation (MSIP)**: Date diff → TTO; drop negative; cast integer.
+**Output (logical)**: F_TTO(primaryid, drug_of_interest, TTO)
+**Downstream**: Figure 5/6 and time-to-onset analyses
 -- Inputs: table_033( primaryid, prod_ai, start_dt, pt, event_dt, ... )
 
 -- (3) Add a raw interval column: event_dt - start_dt
@@ -50,3 +56,4 @@ t039 AS (
 )
 
 SELECT * FROM t039;
+

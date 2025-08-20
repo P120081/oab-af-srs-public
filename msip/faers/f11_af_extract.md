@@ -1,3 +1,9 @@
+﻿# FAERS — AF extract
+**Purpose**: Identify AF cases from REAC.
+**Input**: REAC(pt)
+**Operation (MSIP)**: Filter pt == "Atrial fibrillation"; distinct primaryid.
+**Output (logical)**: F_AF(primaryid)
+**Downstream**: f20_counts2x2.md, f40_plid_timeseries.md
 # Node F11: AF extraction (FAERS)
 
 ## Purpose
@@ -16,3 +22,4 @@ Select FAERS reports that mention "Atrial fibrillation" in REAC.pt.
 SELECT DISTINCT primaryid
 FROM REAC
 WHERE TRIM(pt) = 'Atrial fibrillation';
+

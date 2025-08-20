@@ -1,4 +1,10 @@
--- F20_COUNTS2x2 (FAERS) — counts n11..n22 per DOI + overall
+﻿# FAERS — 2×2 counts
+**Purpose**: Build n11,n12,n21,n22 per drug_of_interest.
+**Input**: F_PLID, F_OAB_STD, F_AF
+**Operation (MSIP)**: Per drug, cross-tab (OAB vs AF) to form 2×2 counts.
+**Output (logical)**: F_COUNTS2x2(drug_of_interest, n11, n12, n21, n22, N)
+**Downstream**: raw_code/analysis/01_disproportionality.py
+-- F20_COUNTS2x2 (FAERS) 窶・counts n11..n22 per DOI + overall
 -- Inputs (logical):
 --   F_PLID(primaryid, sex, age, number_of_drug)
 --   F_OAB_STD(primaryid, drug_of_interest)
@@ -53,3 +59,4 @@ COUNTS_OVERALL AS (
 SELECT * FROM COUNTS_PER_DOI
 UNION ALL
 SELECT * FROM COUNTS_OVERALL;
+

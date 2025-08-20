@@ -1,3 +1,9 @@
+﻿# FAERS — Attach number_of_drug
+**Purpose**: Count drugs per primaryid and attach as number_of_drug.
+**Input**: F_PLID, DRUG
+**Operation (MSIP)**: Group by primaryid in DRUG; join count back to F_PLID.
+**Output (logical)**: F_PLID(+ number_of_drug)
+**Downstream**: f30_strata_base.md
 -- F02_ATTACH_NUMBER_OF_DRUG (FAERS)
 -- Goal: Attach per-report number_of_drug (from your Python node_002) to the PLID.
 -- Inputs:
@@ -22,3 +28,4 @@ WITH DRUGCOUNT AS (
     ON d.primaryid = p.primaryid
 )
 SELECT * FROM PLID_WITH_COUNT;
+

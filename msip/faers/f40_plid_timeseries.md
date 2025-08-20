@@ -1,3 +1,9 @@
+﻿# FAERS — PLID time-series
+**Purpose**: Build start_dt × event_dt pairs for AF reports with OAB.
+**Input**: DRUG, THER (start_dt), DEMO (event_dt), F_OAB_STD, F_AF
+**Operation (MSIP)**: Join DRUG×THER by dsg_drug_seq; join DEMO; filter primaryid in AF & OAB.
+**Output (logical)**: F_PLID_TS(primaryid, drug_of_interest, start_dt, event_dt)
+**Downstream**: f45_tto_compute.md
 -- FAERS time-series PLID (pseudo-SQL for MSIP)
 
 WITH demo_dedup AS (
@@ -24,7 +30,7 @@ demo_reac AS (
 ),
 
 drug_ther AS (
-  -- complete outer join on (primaryid, drug_seq) ≈ (primaryid, dsg_drug_seq)
+  -- complete outer join on (primaryid, drug_seq) 竕・(primaryid, dsg_drug_seq)
   SELECT COALESCE(dr.primaryid, th.primaryid) AS primaryid,
          dr.prod_ai                           AS drug_name,
          th.start_dt                          AS start_dt
@@ -61,3 +67,4 @@ WHERE   start_dt IS NOT NULL
   AND   start_dt <> 'NA' AND start_dt <> 'ERROR'
   AND   event_dt  <> 'NA' AND event_dt  <> 'ERROR';
 -- Save as: F_PLID_TS
+

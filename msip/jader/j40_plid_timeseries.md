@@ -1,25 +1,31 @@
+﻿# JADER — PLID time-series
+**Purpose**: Build start_date × event_date pairs for AF reports with OAB.
+**Input**: DRUG, THER(start_date), DEMO(event_date), J_OAB_STD, J_AF
+**Operation (MSIP)**: Join DRUG×THER by sequence; join DEMO; filter j_id in AF & OAB.
+**Output (logical)**: J_PLID_TS(j_id, drug_of_interest, start_date, event_date)
+**Downstream**: j45_tto_compute.md
 -- JADER time-series PLID (pseudo-SQL for MSIP)
 
 WITH demo_hist AS (
-  SELECT d.識別番号 AS j_id,
-         d.性別     AS sex,
-         d.年齢     AS age,
+  SELECT d.隴伜挨逡ｪ蜿ｷ AS j_id,
+         d.諤ｧ蛻･     AS sex,
+         d.蟷ｴ鮨｢     AS age,
          h.*        -- keep additional history fields if needed
   FROM DEMO d
   LEFT JOIN HIST h
-    ON d.識別番号 = h.識別番号
+    ON d.隴伜挨逡ｪ蜿ｷ = h.隴伜挨逡ｪ蜿ｷ
 ),
 
 drug_reac AS (
   -- complete outer join on patient id to keep rows present in either DRUG or REAC
-  SELECT COALESCE(dr.識別番号, rc.識別番号) AS j_id,
-         dr.医薬品（一般名）               AS drug_name,
-         dr.投与開始日                     AS start_date,
-         rc.有害事象                       AS event_term,
-         rc.有害事象発現日                 AS event_date
+  SELECT COALESCE(dr.隴伜挨逡ｪ蜿ｷ, rc.隴伜挨逡ｪ蜿ｷ) AS j_id,
+         dr.蛹ｻ阮ｬ蜩・ｼ井ｸ闊ｬ蜷搾ｼ・              AS drug_name,
+         dr.謚穂ｸ朱幕蟋区律                     AS start_date,
+         rc.譛牙ｮｳ莠玖ｱ｡                       AS event_term,
+         rc.譛牙ｮｳ莠玖ｱ｡逋ｺ迴ｾ譌･                 AS event_date
   FROM DRUG dr
   FULL OUTER JOIN REAC rc
-    ON dr.識別番号 = rc.識別番号
+    ON dr.隴伜挨逡ｪ蜿ｷ = rc.隴伜挨逡ｪ蜿ｷ
 ),
 
 base AS (
@@ -49,3 +55,4 @@ WHERE   start_date IS NOT NULL
   AND   start_date <> 'NA' AND start_date <> 'ERROR'
   AND   event_date <> 'NA'  AND event_date <> 'ERROR';
 -- Save as: J_PLID_TS
+

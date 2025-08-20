@@ -1,4 +1,10 @@
-# FAERS — PS-only patient-level subset (Scenario 2)
+﻿# FAERS — PS-only PLID
+**Purpose**: Restrict PLID to suspected drug only (role_code == "PS").
+**Input**: F_PLID, DRUG(role_code)
+**Operation (MSIP)**: Select primaryid where role_code == "PS"; subset PLID.
+**Output (logical)**: F_PLID_PS(primaryid, …)
+**Downstream**: Use in Scenario 2 (PS-only) pipelines
+# FAERS 窶・PS-only patient-level subset (Scenario 2)
 
 **Purpose**  
 Restrict to **Primary Suspect** only, then proceed with the same pipeline as the main and stratified analyses.
@@ -14,12 +20,12 @@ Restrict to **Primary Suspect** only, then proceed with the same pipeline as the
 - **Keep all columns**.
 
 ## Output (logical name)
-- `F_PLID_PS(primaryid, ... )` — PS-only patient-level subset
+- `F_PLID_PS(primaryid, ... )` 窶・PS-only patient-level subset
 
 ## Downstream (Scenario 2 flow)
 Replace `F_PLID` with `F_PLID_PS` in all subsequent steps of the main/stratified pipeline:
 - Strata base: derive `F_STRATA_BASE` from `F_PLID_PS`.
-- 2×2 counts: use the existing specs (e.g., `msip/faers/f20_counts2x2.md`) but feed PS-only inputs.
+- 2ﾃ・ counts: use the existing specs (e.g., `msip/faers/f20_counts2x2.md`) but feed PS-only inputs.
 - Metrics: reuse `raw_code/analysis/01_disproportionality.py` (no code change required).
 - Figures/Tables: regenerate as in the main analysis from the PS-only outputs.
 
@@ -29,3 +35,4 @@ Replace `F_PLID` with `F_PLID_PS` in all subsequent steps of the main/stratified
 
 ## Mapping to repo logical names
 - See `docs/DATA_INTERFACES.md` (F_PLID, F_STRATA_BASE, F_COUNTS2x2, etc.).
+

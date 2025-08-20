@@ -1,4 +1,10 @@
--- J20_COUNTS2x2 (JADER) — counts n11..n22 per DOI + overall
+﻿# JADER — 2×2 counts
+**Purpose**: Build n11,n12,n21,n22 per drug_of_interest.
+**Input**: J_PLID, J_OAB_STD, J_AF
+**Operation (MSIP)**: Per drug, cross-tab (OAB vs AF) to form 2×2 counts.
+**Output (logical)**: J_COUNTS2x2(drug_of_interest, n11, n12, n21, n22, N)
+**Downstream**: raw_code/analysis/01_disproportionality.py
+-- J20_COUNTS2x2 (JADER) 窶・counts n11..n22 per DOI + overall
 -- Inputs (logical):
 --   J_PLID(j_id, sex, age, drug_count)
 --   J_OAB_STD(j_id, drug_of_interest)
@@ -54,3 +60,4 @@ COUNTS_OVERALL AS (
 SELECT * FROM COUNTS_PER_DOI
 UNION ALL
 SELECT * FROM COUNTS_OVERALL;
+
