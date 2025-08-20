@@ -22,6 +22,8 @@ This document explains how to regenerate the public figures and tables from the 
 - **JADER**: patient-level with `drug_count`
 - **FAERS**: deduped PLID with `number_of_drug`
 - Logical names are listed in `docs/DATA_INTERFACES.md`.
+- **Scenario 2 (PS-only)**: filter PLID to suspects only — JADER: `医薬品の関与 == "被疑薬"` → `J_PLID_PS`; FAERS: `role_code == "PS"` → `F_PLID_PS`.
+- Then re-run Steps 2–5 replacing `J_PLID/F_PLID` with `J_PLID_PS/F_PLID_PS` (downstream specs unchanged).
 
 ### Step 3 — 2×2 counts
 - Count tables per drug (`n11, n12, n21, n22`) are produced via MSIP according to the specs in `msip/jader/*` and `msip/faers/*`.
