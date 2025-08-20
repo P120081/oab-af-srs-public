@@ -6,6 +6,17 @@ This document explains how to regenerate the public figures from the provided co
 - Python packages (see `requirements.txt`): pandas, numpy, scipy, matplotlib, joblib
 - Fonts: Arial (used by plotting scripts)
 
+### Quickstart
+
+```bash
+# pip
+pip install -r requirements.txt
+
+# or: conda
+conda env create -f environment.yml
+conda activate oab-af-srs
+```
+
 ## Step 1 — OAB normalization and AF extraction
 - **JADER**: `raw_code/jader/01_oab_standardize.py` → outputs `OAB_STD_J(j_id, drug_of_interest)`
 - **FAERS**: `raw_code/faers/01_oab_standardize.py` → outputs `OAB_STD_F(primaryid, drug_of_interest)`
