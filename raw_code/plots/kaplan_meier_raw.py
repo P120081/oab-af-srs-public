@@ -1,121 +1,90 @@
+
+#!/usr/bin/env python3
 """
-Figure 6 — Kaplan–Meier style cumulative curve (raw TTO, 4 groups)
-MSIP Python node
-
-Assumptions
-- Input table is MSIP DataFrame convertible to pandas via `table.to_pandas()`.
-- Columns (case-insensitive) are expected as:
-    * DB code/name: one of {"db"} or column #0 (fallback).
-      Accepts numeric 1/2 or strings "JADER"/"FAERS".
-    * drug name: one of {"prod_ai","drug","product"} or column #1 (fallback).
-      Expect standardized generic names (e.g., "MIRABEGRON","SOLIFENACIN").
-    * TTO (days): one of {"tto","days","time","time_to_onset"} or column #2 (fallback).
-      Non-numeric/negative rows are dropped.
-- Four curves are drawn: JADER/FAERS x MIRABEGRON/SOLIFENACIN.
-  MIRABEGRON is plotted with dash-dot line style.
-
-Output
-- Saves `./figure6_km_raw.png` (RGB, 300 dpi, width 180 mm, height 120 mm).
-- Returns PNGObject for MSIP.
+KM-style cumulative curve (raw TTO).
+Draws 4 curves: JADER/FAERS x MIRABEGRON/SOLIFENACIN by default.
+CLI:
+  python raw_code/plots/kaplan_meier_raw.py --table data/derived/figure6_km_source.csv --out docs/figure6_km_raw.png
 """
-
-# MSIP
-from msi.common.visualization import PNGObject
-
-# General
-import os
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+import os, argparse, numpy as np, pandas as pd, matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
+from _common_utils import OKABE_ITO, load_table_like
 
-# ---------------- Config ----------------
-# Font (unified across repo)
 plt.rcParams["font.family"] = "Arial"
 plt.rcParams["font.size"]   = 12
 
-# Okabe-Ito palette
-OKABE_ITO = {
-    "Orange":  "#E69F00",  # JADER
-    "SkyBlue": "#56B4E9",  # FAERS
-}
-
-# Figure size: width 180 mm x height 120 mm
 MM_TO_INCH = 1.0 / 25.4
-FIG_W = 180 * MM_TO_INCH  # 7.0866 in
-FIG_H = 120 * MM_TO_INCH  # 4.7244 in
-
-# X-range: 0-730 days
+FIG_W = 180 * MM_TO_INCH
+FIG_H = 120 * MM_TO_INCH
 X_RIGHT = 730
 
-# ---------------- Load ----------------
-df = table.to_pandas()
+def km_raw(df: pd.DataFrame, out_png: str, drugs=("MIRABEGRON","SOLIFENACIN")):
+    def _col(cands, fallback_idx):
+        cols = list(df.columns)
+        for c in cols:
+            if str(c).strip().lower() in cands:
+                return c
+        return cols[fallback_idx]
 
-def _find_col(candidates_lower, fallback_idx):
-    cols = list(df.columns)
-    for c in cols:
-        if str(c).strip().lower() in candidates_lower:
-            return c
-    return cols[fallback_idx]
+    DB_COL   = _col({"db"}, 0)
+    DRUG_COL = _col({"prod_ai","drug","product"}, 1)
+    TTO_COL  = _col({"tto","days","time","time_to_onset"}, 2)
 
-DB_COL   = _find_col({"db"}, 0)
-DRUG_COL = _find_col({"prod_ai", "drug", "product"}, 1)
-TTO_COL  = _find_col({"tto", "days", "time", "time_to_onset"}, 2)
+    d = pd.DataFrame()
+    d["_DB"]   = df[DB_COL].astype(str).str.strip().str.upper()
+    d["_DRUG"] = df[DRUG_COL].astype(str).str.strip().str.upper()
+    d["_TTO"]  = pd.to_numeric(df[TTO_COL], errors="coerce").fillna(-1)
 
-# Normalize values
-df["_DB"]   = df[DB_COL].astype(str).str.strip().str.upper()
-df["_DRUG"] = df[DRUG_COL].astype(str).str.strip().str.upper()
-df["_TTO"]  = pd.to_numeric(df[TTO_COL], errors="coerce")
+    db_map_num_to_str = {"1": "JADER", "2": "FAERS"}
+    d.loc[d["_DB"].isin(db_map_num_to_str.keys()), "_DB"] = d["_DB"].map(db_map_num_to_str)
 
-# Map numeric DB codes if present
-db_map_num_to_str = {"1": "JADER", "2": "FAERS"}
-df.loc[df["_DB"].isin(db_map_num_to_str.keys()), "_DB"] = df["_DB"].map(db_map_num_to_str)
+    fig, ax = plt.subplots(figsize=(FIG_W, FIG_H))
+    groups = [
+        ("FAERS", drugs[0],  OKABE_ITO["SkyBlue"], "-."),
+        ("FAERS", drugs[1],  OKABE_ITO["SkyBlue"], "-"),
+        ("JADER", drugs[0],  OKABE_ITO["Orange"],  "-."),
+        ("JADER", drugs[1],  OKABE_ITO["Orange"],  "-"),
+    ]
+    any_curve = False
+    for db_val, drug_val, color, lstyle in groups:
+        t = d.loc[(d["_DB"] == db_val) & (d["_DRUG"] == drug_val), "_TTO"].values
+        t = t[t >= 0]
+        if t.size == 0: 
+            continue
+        t_sorted = np.sort(t)
+        n = t_sorted.size
+        cum = np.arange(1, n + 1) / n
+        t_plot = np.insert(t_sorted, 0, 0.0)
+        cum_plot = np.insert(cum, 0, 0.0)
+        label = f"{db_val} - {drug_val.title()}"
+        ax.step(t_plot, cum_plot, where="post", color=color, linestyle=lstyle, linewidth=2, label=label)
+        any_curve = True
 
-# ---------------- Plot ----------------
-fig, ax = plt.subplots(figsize=(FIG_W, FIG_H))
+    ax.set_xlabel("Days since drug initiation (TTO)")
+    ax.set_ylabel("Cumulative probability")
+    ax.set_xlim(0, X_RIGHT); ax.set_ylim(0, 1.0)
+    ax.grid(True, linestyle=":", linewidth=0.8)
+    ax.xaxis.set_major_locator(MaxNLocator(nbins=8))
+    ax.yaxis.set_major_locator(MaxNLocator(nbins=6))
+    if any_curve:
+        ax.legend(loc="lower right", fontsize=10, frameon=True, title="Database x Drug")
 
-groups = [
-    ("FAERS", "MIRABEGRON",  OKABE_ITO["SkyBlue"], "-."), # dash-dot for mirabegron
-    ("FAERS", "SOLIFENACIN", OKABE_ITO["SkyBlue"], "-"),
-    ("JADER", "MIRABEGRON",  OKABE_ITO["Orange"],  "-."),
-    ("JADER", "SOLIFENACIN", OKABE_ITO["Orange"],  "-"),
-]
+    plt.tight_layout(); plt.savefig(out_png, dpi=300, format="png", transparent=False); plt.close()
 
-any_curve = False
-for db_val, drug_val, color, lstyle in groups:
-    sub = df[(df["_DB"] == db_val) & (df["_DRUG"] == drug_val)].copy()
-    t = pd.to_numeric(sub["_TTO"], errors="coerce").dropna().astype(float).values
-    t = t[t >= 0]  # safety
-    if t.size == 0:
-        print(f"[KM] No TTO rows for {db_val} x {drug_val}")
-        continue
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--table", required=False, help="CSV with columns [DB,prod_ai,TTO]")
+    ap.add_argument("--out",   required=False, default="figure6_km_raw.png")
+    ap.add_argument("--drugA", required=False, default="MIRABEGRON")
+    ap.add_argument("--drugB", required=False, default="SOLIFENACIN")
+    args = ap.parse_args()
 
-    t_sorted = np.sort(t)
-    n = t_sorted.size
-    cum = np.arange(1, n + 1) / n  # 0..1
+    if args.table is None and "table" in globals():
+        df = load_table_like(globals()["table"])
+    else:
+        df = load_table_like(args.table)
 
-    # include origin for step extrapolation
-    t_plot = np.insert(t_sorted, 0, 0.0)
-    cum_plot = np.insert(cum, 0, 0.0)
+    km_raw(df, out_png=args.out, drugs=(args.drugA.upper(), args.drugB.upper()))
 
-    label = f"{db_val} - {drug_val.title()}"
-    ax.step(t_plot, cum_plot, where="post", color=color, linestyle=lstyle, linewidth=2, label=label)
-    any_curve = True
-
-# Axes/legend
-ax.set_xlabel("Days since drug initiation (TTO)")
-ax.set_ylabel("Cumulative probability")
-ax.set_xlim(0, X_RIGHT)
-ax.set_ylim(0, 1.0)
-ax.grid(True, linestyle=":", linewidth=0.8)
-ax.xaxis.set_major_locator(MaxNLocator(nbins=8))
-ax.yaxis.set_major_locator(MaxNLocator(nbins=6))
-ax.legend(loc="lower right", fontsize=10, frameon=True, title="Database x Drug")
-
-# Save (RGB)
-plt.tight_layout()
-out_path = os.path.abspath("./figure6_km_raw.png")
-plt.savefig(out_path, dpi=300, format="png", transparent=False)
-plt.close()
-
-result = PNGObject(out_path)
+if __name__ == "__main__":
+    main()
