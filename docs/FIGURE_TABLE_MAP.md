@@ -127,5 +127,5 @@ python raw_code/plots/kaplan_meier_raw.py `
 - **S1**: Methods — signal metrics & formulas.  
 - **S2**: Source data for Fig. 2 (→ `figure2_source.csv`).  
 - **S3**: Source data for Fig. 3 (→ `figure3_stratified.csv`).  
-- **S4**: Sensitivity & negative‑control results.  
-- **S5**: KM curve without the 2‑year restriction.
+- **S4**: KM curve without the 2‑year restriction.   
+- **S5**: Sensitivity & negative‑control results.
