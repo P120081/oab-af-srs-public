@@ -1,9 +1,8 @@
 name: oab-af-srs
-channels: [conda-forge, defaults]
+channels:
+  - conda-forge
 dependencies:
-  - python
-  - pandas
-  - numpy
-  - scipy
-  - matplotlib
-  - joblib
+  - python=3.11
+  - pip
+  - pip:
+      - -r requirements.txt

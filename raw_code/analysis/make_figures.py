@@ -44,6 +44,42 @@ def run(cmd, dry_run=False):
 def ensure_docs():
     DOCS.mkdir(parents=True, exist_ok=True)
 
+
+def run_prep(py_exec, dry_run=False):
+    """Discover default inputs and call prep_standardize.py.
+    Defaults:
+      data/faers_DRUG.csv -> data/derived/faers_oab_standardized.csv
+      data/jader_DRUG.csv -> data/derived/jader_oab_standardized.csv
+    """
+    from pathlib import Path
+    import subprocess, sys
+    REPO = Path(__file__).resolve().parents[2]  # repo root
+    PREP = REPO / "raw_code" / "analysis" / "prep_standardize.py"
+    DERIVED = REPO / "data" / "derived"
+    DERIVED.mkdir(parents=True, exist_ok=True)
+
+    faers_in  = REPO / "data" / "faers_DRUG.csv"
+    faers_out = DERIVED / "faers_oab_standardized.csv"
+    jader_in  = REPO / "data" / "jader_DRUG.csv"
+    jader_out = DERIVED / "jader_oab_standardized.csv"
+
+    cmd = [str(py_exec), str(PREP)]
+    if faers_in.exists():
+        cmd += ["--faers-in", str(faers_in), "--faers-out", str(faers_out)]
+    if jader_in.exists():
+        cmd += ["--jader-in", str(jader_in), "--jader-out", str(jader_out)]
+
+    if len(cmd) == 2:
+        print("[PREP] No default inputs found (data/faers_DRUG.csv or data/jader_DRUG.csv). Skipping.")
+        return 0
+
+    if dry_run:
+        print("[DRY][PREP] ", " ".join(cmd))
+        return 0
+    print("[PREP] ", " ".join(cmd))
+    return subprocess.call(cmd)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--fig2", action="store_true", help="Build Figure 2 (forest)")
@@ -52,9 +88,21 @@ def main():
     ap.add_argument("--fig5", action="store_true", help="Build Figure 5 (TTO distribution) for each tto_*.csv")
     ap.add_argument("--fig6", action="store_true", help="Build Figure 6 (KM raw) if data present")
     ap.add_argument("--all",  action="store_true", help="Build all (default if no flags)")
+    ap.add_argument("--prep", action="store_true", help="Run standardization (prep_standardize.py) before figures")
+    ap.add_argument("--prep-only", action="store_true", help="Run only standardization and exit")
     ap.add_argument("--dry-run", action="store_true", help="Print commands without executing")
     ap.add_argument("--py", default=sys.executable, help="Python executable to use for sub-commands")
     args = ap.parse_args()
+
+    # If prep-only, or prep requested, run standardization first
+    do_prep = getattr(args, 'prep', False) or getattr(args, 'prep_only', False)
+    dry = getattr(args, 'dry_run', False)
+    if do_prep:
+        rc = run_prep(py_exec=args.py if hasattr(args, 'py') else sys.executable, dry_run=dry)
+        if rc != 0:
+            sys.exit(rc)
+        if getattr(args, 'prep_only', False):
+            return
 
     if not any([args.fig2, args.fig3, args.fig4, args.fig5, args.fig6, args.all]):
         args.all = True

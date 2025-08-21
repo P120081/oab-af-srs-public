@@ -41,6 +41,16 @@ N_JOBS = -1                             # joblib parallelism: -1 = use all cores
 VERBOSE_BOOTSTRAP = False               # True -> print head of resampled draws (noisy)
 SEED = None                             # set e.g. 12345 for deterministic sampling
 
+# ----- Optional CLI overrides (safe in MSIP as well) -----
+if __name__ == "__main__":
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--n_boot", type=int, default=N_BOOTSTRAP, help="Bootstrap iterations (default: 10000)")
+    ap.add_argument("--seed", type=int, default=None, help="Random seed for bootstrap (default: None)")
+    args, _ = ap.parse_known_args()
+    N_BOOTSTRAP = int(args.n_boot)
+    SEED = args.seed
+
 # ----- Load data -----
 df = table.to_pandas()
 # TTO is the 4th column (0-based index 3)

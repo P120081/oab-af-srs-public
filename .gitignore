@@ -1,12 +1,24 @@
-﻿# Python
+# Byte-compiled / cache
 __pycache__/
 *.py[cod]
-*.ipynb_checkpoints/
+*.pyo
+*.pyd
+*.so
+
+# Environments
+.venv/
+.env/
+.envrc
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Private or large data (do not commit raw data)
-data/raw/
-data/private/
+# Build / outputs
+docs/*.png
+docs/*.tif
+*.log
+
+# Data (optional; keep derived CSVs tracked)
+data/raw/*
+!data/derived/
