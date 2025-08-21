@@ -1,132 +1,73 @@
-# Reproduction Instructions (Public)
+# Reproduction Instructions (Final)
 
-This is the **one‑page recipe** to rebuild every public figure from this repository.
-
----
+This is the authoritative, step-by-step guide to regenerate every artifact.
 
 ## 0) Environment
-
-Using Conda (recommended):
-```bash
-conda env create -f environment.yml
-conda activate oab-af-srs
-```
-
-Using pip + venv:
-```bash
-python -m venv .venv
-# Windows PowerShell:
-.\.venv\Scripts\Activate.ps1
-# macOS/Linux:
-source .venv/bin/activate
-
+```powershell
 pip install -r requirements.txt
+# or: conda env create -f environment.yml && conda activate oab-af-srs-public
 ```
 
-> All scripts are pure‑Python based on `numpy`, `pandas`, `matplotlib`, and `scipy`. **MSIP is not required** (MSIP utilities are gracefully bypassed in CLI mode).
+## 1) Prepare inputs (data/derived)
+See `DATA_INTERFACES.md` for required columns. Ensure ASCII headers for public files when possible.
 
----
-
-## 1) Minimal inputs
-
-Everything needed is under `data/derived/`:
-- `figure2_source.csv`
-- `figure3_stratified.csv`
-- `volcano_mirabegron.csv`, `volcano_solifenacin.csv`
-- `tto_FAERS_mirabegron.csv`, `tto_JADER_solifenacin.csv`
-- `figure6_km_source.csv`
-
-Column schemas: see `DATA_INTERFACES.md`.
-
----
-
-## 2) Rebuild all at once
-
-From repo root:
+## 2) One-shot build
 ```powershell
-# Discover inputs & standardize (optional, for users with raw data)
 python raw_code/analysis/make_figures.py --prep
-
-# Generate all figures from data/derived
-python raw_code/analysis/make_figures.py
-```
-
-Dry‑run (show commands only):
-```powershell
+# dry-run only:
 python raw_code/analysis/make_figures.py --prep --dry-run
 ```
 
----
+## 3) Individual scripts
 
-## 3) Rebuild individually (examples, PowerShell)
-
-**Fig.2**
+### Fig.2
 ```powershell
-python raw_code/plots/forest_plot.py `
-  --table data/derived/figure2_source.csv `
-  --out   docs/figure2_forest_plot.png `
-  --tif   docs/figure2_forest_plot.tif
+python raw_code/plots/forest_plot.py --table data/derived/figure2_source.csv `
+  --out docs/figure2_forest_plot.png --tif docs/figure2_forest_plot.tif
 ```
 
-**Fig.3**
+### Fig.3
 ```powershell
-python raw_code/plots/forest_plot_multidrug.py `
-  --table data/derived/figure3_stratified.csv `
-  --out   docs/figure3_forest_plot.png
+python raw_code/plots/forest_plot_multidrug.py --table data/derived/figure3_stratified.csv `
+  --out docs/figure3_forest_plot.png
 ```
 
-**Fig.4 (Volcano)**
+### Fig.4 (Volcano)
 ```powershell
-python raw_code/plots/volcano_plot.py `
-  --table data/derived/volcano_mirabegron.csv `
-  --out   docs/volcano_mirabegron.png `
-  --tif   docs/volcano_mirabegron.tif `
-  --title MIRABEGRON
+python raw_code/plots/volcano_plot.py --table data/derived/volcano_mirabegron.csv `
+  --out docs/volcano_mirabegron.png --tif docs/volcano_mirabegron.tif --title MIRABEGRON
 
-python raw_code/plots/volcano_plot.py `
-  --table data/derived/volcano_solifenacin.csv `
-  --out   docs/volcano_solifenacin.png `
-  --tif   docs/volcano_solifenacin.tif `
-  --title SOLIFENACIN
+python raw_code/plots/volcano_plot.py --table data/derived/volcano_solifenacin.csv `
+  --out docs/volcano_solifenacin.png --tif docs/volcano_solifenacin.tif --title SOLIFENACIN
 ```
 
-**Fig.5 (TTO, 2‑year axis)**  
+### Fig.5 (TTO, y=0–730)
 ```powershell
-python raw_code/plots/figure5_tto_distribution.py `
-  --table data/derived/tto_FAERS_mirabegron.csv `
-  --out   docs/figure5_tto_FAERS_mirabegron.png `
-  --tif   docs/figure5_tto_FAERS_mirabegron.tif `
-  --ymax  730
+python raw_code/plots/figure5_tto_distribution.py --table data/derived/tto_FAERS_mirabegron.csv `
+  --out docs/figure5_tto_FAERS_mirabegron.png --tif docs/figure5_tto_FAERS_mirabegron.tif
 
-python raw_code/plots/figure5_tto_distribution.py `
-  --table data/derived/tto_JADER_solifenacin.csv `
-  --out   docs/figure5_tto_JADER_solifenacin.png `
-  --tif   docs/figure5_tto_JADER_solifenacin.tif `
-  --ymax  730
+python raw_code/plots/figure5_tto_distribution.py --table data/derived/tto_JADER_solifenacin.csv `
+  --out docs/figure5_tto_JADER_solifenacin.png --tif docs/figure5_tto_JADER_solifenacin.tif
 ```
 
-**Fig.6**
+### Fig.6 (KM, raw)
 ```powershell
-python raw_code/plots/kaplan_meier_raw.py `
-  --table data/derived/figure6_km_source.csv `
-  --out   docs/figure6_km_raw.png
+python raw_code/plots/kaplan_meier_raw.py --table data/derived/figure6_km_source.csv `
+  --out docs/figure6_km_raw.png
 ```
 
----
+## 4) Upstream (MSIP) companion nodes
+- **JADER**
+  - DEMO numericization + BMI: `raw_code/jader/00_demo_numeric_bmi.py`
+  - DRUG add count (服薬数): `raw_code/jader/02_drug_attach_count.py`
+  - Merge: DEMO (anchor) ← DRUG ← HIST on `識別番号`
 
-## 4) Troubleshooting
+- **FAERS**
+  - DEMO deduplicate (latest caseversion): `raw_code/faers/00_demo_dedup.py`
+  - DRUG add count: `raw_code/faers/02_drug_attach_count.py`
+  - Merge: DEMO (anchor) ← DRUG ← OUTC ← INDI on `primaryid`
 
-- **`ModuleNotFoundError: msi`** – Expected: the public scripts don’t require MSIP. All scripts have a CLI path that bypasses MSIP; use the commands above with `--table`/`--out` flags.
-- **Glyph warning for ✓ in Arial** – Harmless. We embed the check mark with a DejaVu fallback when needed.
-- **`Axis limits cannot be NaN or Inf` (volcano)** – Caused by zero/invalid p. The script parses scientific notation and drops invalid rows; ensure `p-value` is a valid numeric or numeric string.
-- **Plots cut off (volcano labels)** – This figure intentionally uses tight layout. If labels extend beyond, render PNG and adjust in the manuscript layout, or reduce label count in the CSV.
-- **TTO y‑axis** – Use `--ymax 730` for 2‑year view; adjust `--hist-max` if histogram counts clip.
-
----
-
-## 5) License & citation
-
-- **Code**: see `LICENSE` (e.g., MIT).  
-- **Figures/Docs**: © Authors. Consider CC BY 4.0 if redistribution is desired.
-
-Cite using the included `CITATION.cff`. After acceptance, add a GitHub Release + Zenodo archive for a DOI.
+## 5) Publishing notes
+- Keep generated figures under `docs/` (OK to include in the repo).  
+- If file sizes are large, prefer GitHub Releases or Git LFS for `.tif`.  
+- Ensure `DATA_INTERFACES.md` and this file travel with the release tag.
