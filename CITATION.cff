@@ -2,8 +2,8 @@ cff-version: 1.2.0
 message: "If you use this repository, please cite the following work."
 title: "OAB–AF signal detection using spontaneous reporting systems (reproducibility package)"
 authors:
-  - family-names: "Nagura"
-    given-names: "Kyosuke"
+  - family-names: ""
+    given-names: ""
   # Add all authors here
 type: software
 version: "1.0.0"
@@ -14,8 +14,8 @@ preferred-citation:
   title: "Atrial Fibrillation Signals with Overactive Bladder Drugs across JADER and FAERS: Disproportionality and Time-to-Onset Analyses"
   # Replace the following fields upon acceptance:
   authors:
-    - family-names: "Nagura"
-      given-names: "Kyosuke"
+    - family-names: ""
+      given-names: ""
   journal: "Frontiers in Pharmacology"
   year: 2025
   doi: "10.XXXX/fphar.XXXXXXX"

@@ -24,6 +24,7 @@ Key docs:
 - `FIGURE_TABLE_MAP.md` – figure numbers ↔ source files ↔ scripts.
 - `DATA_INTERFACES.md` – expected column names & schema for inputs/outputs.
 - `docs/README.md` – what’s in `docs/` and how to re-create each image.
+- `msip/faers/README.md`, `msip/jader/README.md` – MSIP node notes (merge keys, dedup, feature adds).
 
 ---
 
@@ -42,7 +43,10 @@ Or pip:
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+# macOS/Linux
+source .venv/bin/activate
+# Windows (PowerShell)
+.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
@@ -81,6 +85,15 @@ python raw_code/plots/figure5_tto_distribution.py --table data/derived/tto_JADER
 python raw_code/plots/kaplan_meier_raw.py --table data/derived/figure6_km_source.csv   --out docs/figure6_km_raw.png
 ```
 
+**Windows (PowerShell) line continuation** uses backticks (\`):
+
+```powershell
+python raw_code/plots/forest_plot.py `
+  --table data/derived/figure2_source.csv `
+  --out docs/figure2_forest_plot.png `
+  --tif docs/figure2_forest_plot.tif
+```
+
 ---
 
 ## Data availability
@@ -89,15 +102,19 @@ python raw_code/plots/kaplan_meier_raw.py --table data/derived/figure6_km_source
 - **FAERS/JADER** case-level data are publicly accessible from their official portals; we do **not** redistribute case-level data here.
 - All scripts required to recompute metrics from the 2×2 counts are provided under `raw_code/`.
 
+**Notes for CSV headers**
+
+- Public CSVs favor ASCII headers (`p_value`, `chi2`). Plot scripts are tolerant to `p`, `p-value`, or scientific notation like `5.54E-18` (converted to float then `-log10(p)`).
+
 ---
 
-## Supplementary files mapping
+## Supplementary files mapping (final)
 
 - **S1**: Methods — signal metrics & formulas.
 - **S2**: Source data for Fig. 2.
 - **S3**: Source data for Fig. 3.
-- **S4**: Sensitivity and negative-control analyses.
-- **S5**: Kaplan–Meier curve without 2-year restriction.
+- **S4**: Kaplan–Meier curve **without** 2‑year restriction (full horizon).
+- **S5**: Sensitivity and negative‑control analyses (Excel‑only).
 
 See `FIGURE_TABLE_MAP.md` for exact filenames and columns.
 
