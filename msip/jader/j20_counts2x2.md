@@ -1,63 +1,35 @@
-﻿# JADER — 2×2 counts
-**Purpose**: Build n11,n12,n21,n22 per drug_of_interest.
-**Input**: J_PLID, J_OAB_STD, J_AF
-**Operation (MSIP)**: Per drug, cross-tab (OAB vs AF) to form 2×2 counts.
-**Output (logical)**: J_COUNTS2x2(drug_of_interest, n11, n12, n21, n22, N)
+# JADER — 2×2 counts per drug
+
+**Purpose**: Build n11, n12, n21, n22 per drug_of_interest.  
+**Input**: J_PLID, J_OAB_STD, J_AF  
+**Operation (MSIP)**: For each drug_of_interest, count AF vs non-AF among OAB-exposed and non-exposed cases.  
+**Output (logical)**: J_COUNTS2x2(drug_of_interest, n11, n12, n21, n22, N, n1plus, nplus1)  
 **Downstream**: raw_code/analysis/01_disproportionality.py
--- J20_COUNTS2x2 (JADER) 窶・counts n11..n22 per DOI + overall
--- Inputs (logical):
---   J_PLID(j_id, sex, age, drug_count)
---   J_OAB_STD(j_id, drug_of_interest)
---   J_AF(j_id)
 
-WITH BASE AS (
-  SELECT DISTINCT
-         j_id,
-         sex,
-         age,
-         CASE WHEN COALESCE(drug_count,0) >= 5 THEN '>=5' ELSE '<5' END AS poly5
-  FROM J_PLID
+## Pseudo-SQL
+```sql
+WITH base AS (
+  SELECT p.j_id,
+         CASE WHEN o.j_id IS NOT NULL THEN 1 ELSE 0 END AS oab_exposed,
+         CASE WHEN a.j_id IS NOT NULL THEN 1 ELSE 0 END AS is_af,
+         o.drug_of_interest
+  FROM J_PLID p
+  LEFT JOIN J_OAB_STD o USING (j_id)
+  LEFT JOIN J_AF      a USING (j_id)
 ),
-DOI_LIST AS (SELECT DISTINCT drug_of_interest FROM J_OAB_STD),
-
-COUNTS_PER_DOI AS (
-  SELECT
-    d.drug_of_interest,
-    COUNT(DISTINCT CASE WHEN oc.j_id IS NOT NULL AND af.j_id IS NOT NULL THEN b.j_id END) AS n11,
-    COUNT(DISTINCT CASE WHEN oc.j_id IS NOT NULL AND af.j_id IS NULL THEN b.j_id END)     AS n12,
-    COUNT(DISTINCT CASE WHEN oc.j_id IS NULL AND af.j_id IS NOT NULL THEN b.j_id END)     AS n21,
-    COUNT(DISTINCT CASE WHEN oc.j_id IS NULL AND af.j_id IS NULL THEN b.j_id END)         AS n22
-  FROM BASE b
-  JOIN DOI_LIST d ON 1=1
-  LEFT JOIN J_OAB_STD oc ON oc.j_id = b.j_id AND oc.drug_of_interest = d.drug_of_interest
-  LEFT JOIN J_AF      af ON af.j_id = b.j_id
-  -- exclude from background any report containing the DOI
-  WHERE NOT EXISTS (
-    SELECT 1 FROM J_OAB_STD z
-    WHERE z.j_id = b.j_id
-      AND z.drug_of_interest = d.drug_of_interest
-      AND oc.j_id IS NULL
-  )
-  GROUP BY d.drug_of_interest
-),
-
-COUNTS_OVERALL AS (
-  SELECT
-    'Overall' AS drug_of_interest,
-    COUNT(DISTINCT CASE WHEN oc.j_id IS NOT NULL AND af.j_id IS NOT NULL THEN b.j_id END) AS n11,
-    COUNT(DISTINCT CASE WHEN oc.j_id IS NOT NULL AND af.j_id IS NULL THEN b.j_id END)     AS n12,
-    COUNT(DISTINCT CASE WHEN oc.j_id IS NULL AND af.j_id IS NOT NULL THEN b.j_id END)     AS n21,
-    COUNT(DISTINCT CASE WHEN oc.j_id IS NULL AND af.j_id IS NULL THEN b.j_id END)         AS n22
-  FROM BASE b
-  LEFT JOIN J_OAB_STD oc ON oc.j_id = b.j_id
-  LEFT JOIN J_AF      af ON af.j_id = b.j_id
-  WHERE NOT EXISTS (
-    SELECT 1 FROM J_OAB_STD z
-    WHERE z.j_id = b.j_id AND oc.j_id IS NULL
-  )
+per_drug AS (
+  SELECT drug_of_interest,
+         SUM(CASE WHEN oab_exposed=1 AND is_af=1 THEN 1 ELSE 0 END) AS n11,
+         SUM(CASE WHEN oab_exposed=1 AND is_af=0 THEN 1 ELSE 0 END) AS n12,
+         SUM(CASE WHEN oab_exposed=0 AND is_af=1 THEN 1 ELSE 0 END) AS n21,
+         SUM(CASE WHEN oab_exposed=0 AND is_af=0 THEN 1 ELSE 0 END) AS n22,
+         COUNT(*) AS N,
+         SUM(CASE WHEN oab_exposed=1 THEN 1 ELSE 0 END) AS n1plus,
+         SUM(CASE WHEN is_af=1 THEN 1 ELSE 0 END)     AS nplus1
+  FROM base
+  WHERE drug_of_interest IS NOT NULL
+  GROUP BY drug_of_interest
 )
+SELECT * FROM per_drug;
 
-SELECT * FROM COUNTS_PER_DOI
-UNION ALL
-SELECT * FROM COUNTS_OVERALL;
-
+```

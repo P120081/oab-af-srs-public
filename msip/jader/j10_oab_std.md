@@ -1,38 +1,17 @@
-﻿# JADER — OAB standardize
-**Purpose**: Normalize OAB generic names (Japanese → ASCII tokens).
-**Input**: DRUG(一般名), mapping in raw_code/jader/01_oab_standardize.py
-**Operation (MSIP)**: Map to {oxybutynin,…,vibegron}; produce (j_id, drug_of_interest).
-**Output (logical)**: J_OAB_STD(j_id, drug_of_interest)
+# JADER — OAB standardize (OAB_STD)
+
+**Purpose**: Normalize Japanese generic names to ASCII tokens (drug_of_interest).  
+**Input**: DRUG_J(一般名), mapping defined in raw_code/jader/01_oab_standardize.py  
+**Operation (MSIP)**: Map to tokens {oxybutynin,…,vibegron}. DISTINCT per j_id,drug_of_interest.  
+**Output (logical)**: J_OAB_STD(j_id, drug_of_interest)  
 **Downstream**: j20_counts2x2.md, j40_plid_timeseries.md
--- J10_OAB_STD (JADER) 窶・normalize OAB generics to ASCII tokens
--- Input: DRUG("隴伜挨逡ｪ蜿ｷ", "蛹ｻ阮ｬ蜩・ｼ井ｸ闊ｬ蜷搾ｼ・)
--- Output: OAB_STD_J(j_id, drug_of_interest)
 
-WITH DRUG_STD AS (
-  SELECT
-    d."隴伜挨逡ｪ蜿ｷ" AS j_id,
-    d."蛹ｻ阮ｬ蜩・ｼ井ｸ闊ｬ蜷搾ｼ・ AS jp_generic
-  FROM DRUG d
-  WHERE d."隴伜挨逡ｪ蜿ｷ" IS NOT NULL
-    AND d."蛹ｻ阮ｬ蜩・ｼ井ｸ闊ｬ蜷搾ｼ・ IS NOT NULL
-),
-OAB_STD_J AS (
-  SELECT DISTINCT
-    j_id,
-    CASE
-      WHEN jp_generic LIKE '%繧ｽ繝ｪ繝輔ぉ繝翫す繝ｳ%'   THEN 'solifenacin'
-      WHEN jp_generic LIKE '%繝溘Λ繝吶げ繝ｭ繝ｳ%'     THEN 'mirabegron'
-      WHEN jp_generic LIKE '%繧ｪ繧ｭ繧ｷ繝悶メ繝九Φ%'   THEN 'oxybutynin'
-      WHEN jp_generic LIKE '%繝励Ο繝斐・繝ｪ繝ｳ%'     THEN 'propiverine'
-      WHEN jp_generic LIKE '%繧､繝溘ム繝輔ぉ繝翫す繝ｳ%' THEN 'imidafenacin'
-      WHEN jp_generic LIKE '%繝医Ν繝・Ο繧ｸ繝ｳ%'     THEN 'tolterodine'
-      WHEN jp_generic LIKE '%繝輔ぉ繧ｽ繝・Ο繧ｸ繝ｳ%'   THEN 'fesoterodine'
-      WHEN jp_generic LIKE '%繝薙・繧ｰ繝ｭ繝ｳ%'       THEN 'vibegron'
-      ELSE NULL
-    END AS drug_of_interest
-  FROM DRUG_STD
-)
-SELECT *
-FROM OAB_STD_J
-WHERE drug_of_interest IS NOT NULL;
+## Pseudo-SQL
+```sql
+-- Conceptual: mapping is implemented in Python; here we show the logical result.
+SELECT DISTINCT d.j_id, m.drug_of_interest
+FROM DRUG_J d
+JOIN OAB_NAME_MAP_J m  -- conceptual view produced by Python
+  ON m.raw_name_jp = d.一般名;
 
+```
