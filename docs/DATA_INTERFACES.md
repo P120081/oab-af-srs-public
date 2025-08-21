@@ -1,5 +1,9 @@
 # Data Interfaces (Logical Names)
 
+**Purpose.** Canonical logical table names and column conventions used across MSIP nodes and Python scripts. These names are **tool-agnostic** and must be used for all public exports (ASCII-only).
+
+# Data Interfaces (Logical Names)
+
 This document defines canonical **logical** table names used across the repo.
 They are not tied to any specific tool. MSIP nodes, raw Python, or exported CSVs
 should map to these names for clarity and reproducibility.
@@ -129,3 +133,15 @@ data/derived/f_tto.csv
   - **Figure 6 (KM)** minimum columns: `DB` (1/2 or strings) and `TTO` (days). The provided scripts default to
     position-based indexing: column 0 = DB, column 4 = TTO.
   - **Table 2 (Weibull)** minimum column: `TTO` (strictly positive days).
+
+
+---
+## Minimal public column contracts (recap)
+
+- **Disproportionality (any figure)**: `DB, drug_of_interest, n11, n12, n21, n22, ROR, ROR025, ROR975, p_value, PRR, PRR025, PRR975, chi2, IC, IC025, IC975`
+  - *Minimal for Fig.2*: `DB, drug_of_interest, n11, ROR, ROR025, ROR975` (optional: `p_value, PRR025, chi2, IC025`).
+- **Stratified metrics (Fig.3/Fig.4)**: previous + `Subgroup` (ASCII token; e.g., `Sex=F`, `Age=70-99`, `Drugs>=5`).
+- **KM raw (Fig.6)**: `DB, prod_ai (drug), TTO` (days; positive only).
+- **Weibull/TTO (Fig.5/Table 2)**: `TTO` (days; positive only) plus optional strata columns.
+
+All column names are **case-sensitive**.

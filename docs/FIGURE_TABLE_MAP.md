@@ -1,5 +1,9 @@
 # Figure / Table mapping
 
+This file lists, for each public object, the **script**, **inputs**, **required columns**, **outputs**, and any **parameters**. A CSV version is provided as `FIGURE_TABLE_MAP.csv`.
+
+# Figure / Table mapping
+
 This repository maps every public figure/table to the exact code and inputs used.
 
 ## Figure 2 — Forest plot
@@ -61,3 +65,9 @@ This repository maps every public figure/table to the exact code and inputs used
 - **Scenario 3 (AF-excluded)**  
   Upstream PLIDs are replaced with AF-excluded versions:  
   `J_PLID_AF_EXCL`, `F_PLID_AF_EXCL` (see specs `msip/jader/j60_af_exclude_plid.md`, `msip/faers/f60_af_exclude_plid.md`; Python `raw_code/analysis/05a_jader_af_exclude_plid.py`, `raw_code/analysis/05b_faers_af_exclude_plid.py`). Downstream code and figure mapping are unchanged.
+
+
+---
+## CSV version (summary)
+
+- See `FIGURE_TABLE_MAP.csv` for a machine-readable mapping used by CI/checkers.
