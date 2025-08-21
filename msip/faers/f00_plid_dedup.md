@@ -1,3 +1,7 @@
+# FAERS — PLID de-duplication (DEMO→F_PLID)
+
+_Last updated: 2025-08-21_
+
 # FAERS — PLID de-duplication
 
 **Purpose**: Deduplicate DEMO per case and retain core patient/event fields.  
@@ -22,3 +26,13 @@ JOIN latest l
   ON d.primaryid = l.primaryid AND d.caseversion = l.maxv;
 
 ```
+
+---
+## QA checklist
+- [ ] Column names are ASCII-only (e.g., `chi2`, `p_value`).
+- [ ] Date fields parseable (YYYYMMDD/ISO); no future dates; timezone-agnostic.
+- [ ] Null handling documented; duplicated `primaryid` rows removed where intended.
+- [ ] Row counts before→after are recorded in MSIP log.
+- [ ] Deterministic ordering (ORDER BY) for reproducible exports.
+
+**Outputs:** F_PLID(primaryid, sex, age, event_dt, …)

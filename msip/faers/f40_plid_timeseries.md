@@ -1,3 +1,7 @@
+# FAERS — PLID time-series (start_dt×event_dt→F_PLID_TS)
+
+_Last updated: 2025-08-21_
+
 # FAERS — PLID time-series (start_dt × event_dt)
 
 **Purpose**: Build start_dt × event_dt pairs for AF reports with OAB.  
@@ -35,3 +39,13 @@ JOIN DEMO_STD ds ON ds.primaryid = dt.primaryid
 JOIN AF_CASES a  ON a.primaryid = dt.primaryid;
 
 ```
+
+---
+## QA checklist
+- [ ] Column names are ASCII-only (e.g., `chi2`, `p_value`).
+- [ ] Date fields parseable (YYYYMMDD/ISO); no future dates; timezone-agnostic.
+- [ ] Null handling documented; duplicated `primaryid` rows removed where intended.
+- [ ] Row counts before→after are recorded in MSIP log.
+- [ ] Deterministic ordering (ORDER BY) for reproducible exports.
+
+**Outputs:** F_PLID_TS(primaryid, drug_of_interest, start_dt, event_dt)
