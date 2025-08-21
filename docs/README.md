@@ -1,28 +1,41 @@
-# Documentation
+# docs/ — Generated figures
 
-This folder contains everything needed to **reproduce** the public figures and to understand the **data interfaces** used across the project. It is written to be skimmed quickly by reviewers.
+These images are generated from `data/derived/` using the scripts in `raw_code/plots/`. They serve as verified examples to compare against when reproducing the analysis.
 
-## What’s inside
-- **FIGURE_TABLE_MAP.csv** — canonical mapping between each Figure/Table and the **exact** script, inputs, and outputs.
-- **REPRO_INSTRUCTIONS.md** — step-by-step instructions (MSIP + Python) to regenerate figures.
-- **DATA_INTERFACES.md** — canonical logical schemas and naming conventions (ASCII-only public columns).
+## Contents (expected)
 
-## Quickstart (90 seconds)
+- `figure2_forest_plot.png` (+ `.tif`) — Forest plot (Fig.2)
+- `figure3_forest_plot.png` — Stratified forest plot (Fig.3)
+- `volcano_mirabegron.png` (+ `.tif`) — Volcano plot, MIRABEGRON
+- `volcano_solifenacin.png` (+ `.tif`) — Volcano plot, SOLIFENACIN
+- `figure5_tto_FAERS_mirabegron.png` (+ `.tif`) — TTO distribution (FAERS, 2-year view)
+- `figure5_tto_JADER_solifenacin.png` (+ `.tif`) — TTO distribution (JADER, 2-year view)
+- `figure6_km_raw.png` — Kaplan–Meier curve
+
+> If `.tif` files make the repository large, track them with **Git LFS** or attach them to a GitHub Release/Zenodo and keep only PNG here.
+
+## Regenerate
+
+From repository root:
+
 ```bash
-# create environment
-pip install -r requirements.txt    # or: conda env create -f environment.yml && conda activate oab-af-srs
-
-# reproduce Figure 2 (forest) from a prepared CSV
-python raw_code/plots/forest_plot.py --table data/derived/figure2_source.csv --out docs/figure2_forest_plot.png
-
-# reproduce Figure 6 (raw KM)
-python raw_code/plots/kaplan_meier_raw.py --table data/derived/figure6_km_source.csv --out docs/figure6_km_raw.png
+python raw_code/analysis/make_figures.py
 ```
 
-## Conventions
-- **ASCII-only column names** in public artifacts (e.g., `chi2`, `p_value`). Internally you may keep native encodings; normalize on export.
-- **DB** ∈ {JADER, FAERS}. **OAB tokens**: oxybutynin, propiverine, solifenacin, imidafenacin, tolterodine, fesoterodine, mirabegron, vibegron.
-- **Stability rule**: drop rows with `n11 < 3` prior to metrics/plots.
-- **No ad-hoc truncation**: the supplementary KM (S5) uses the full window; main-text KM may show ≤2 years for readability.
+Or individually (examples):
 
-(Generated 2025-08-21.)
+```bash
+python raw_code/plots/forest_plot.py --table data/derived/figure2_source.csv   --out docs/figure2_forest_plot.png --tif docs/figure2_forest_plot.tif
+
+python raw_code/plots/forest_plot_multidrug.py --table data/derived/figure3_stratified.csv   --out docs/figure3_forest_plot.png
+
+python raw_code/plots/volcano_plot.py --table data/derived/volcano_mirabegron.csv   --out docs/volcano_mirabegron.png --tif docs/volcano_mirabegron.tif --title MIRABEGRON
+
+python raw_code/plots/volcano_plot.py --table data/derived/volcano_solifenacin.csv   --out docs/volcano_solifenacin.png --tif docs/volcano_solifenacin.tif --title SOLIFENACIN
+
+python raw_code/plots/figure5_tto_distribution.py --table data/derived/tto_FAERS_mirabegron.csv   --out docs/figure5_tto_FAERS_mirabegron.png --tif docs/figure5_tto_FAERS_mirabegron.tif --ymax 730
+
+python raw_code/plots/figure5_tto_distribution.py --table data/derived/tto_JADER_solifenacin.csv   --out docs/figure5_tto_JADER_solifenacin.png --tif docs/figure5_tto_JADER_solifenacin.tif --ymax 730
+
+python raw_code/plots/kaplan_meier_raw.py --table data/derived/figure6_km_source.csv   --out docs/figure6_km_raw.png
+```

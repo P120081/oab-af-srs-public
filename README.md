@@ -1,52 +1,122 @@
-# OAB–AF SRS: Public Reproducibility Package
+# oab-af-srs-public
 
-This repository contains all materials to **reproduce** the analyses and figures in our manuscript submitted to *Frontiers in Pharmacology*.  
-It is designed for **fast review** and **clear traceability** from raw(ish) inputs → derived CSVs → plots.
+Reproducible code and derived data to accompany the manuscript submitted to *Frontiers in Pharmacology* on signals of atrial fibrillation (AF) associated with overactive bladder (OAB) drugs using FAERS and JADER.
+
+This repository contains the **public** analysis pipeline and the **minimal derived inputs** required to regenerate the figures/tables reported in the paper (no case-level FAERS/JADER data are redistributed).
+
+---
+
+## What’s here
+
+```
+data/
+  derived/                  # Minimal inputs to reproduce all plots (CSV)
+docs/                       # Generated figures (PNG/TIFF)
+msip/                       # Step-by-step pipeline notes for FAERS/JADER (documentation)
+raw_code/
+  analysis/                 # End-to-end helpers and orchestration
+  plots/                    # Standalone figure scripts (CLI/MSIP compatible)
+```
+
+Key docs:
+
+- `REPRO_INSTRUCTIONS.md` – end-to-end commands to regenerate all outputs.
+- `FIGURE_TABLE_MAP.md` – figure numbers ↔ source files ↔ scripts.
+- `DATA_INTERFACES.md` – expected column names & schema for inputs/outputs.
+- `docs/README.md` – what’s in `docs/` and how to re-create each image.
+
+---
 
 ## Quickstart
 
-> Python ≥ 3.11 is recommended (works with 3.13 as well). Use Conda if you prefer an isolated env.
+### 1) Environment
+
+Using Conda (recommended):
 
 ```bash
-# (A) Using pip (minimal)
-python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-
-# Optional: standardize OAB names (FAERS/JADER) if you have DRUG tables available
-python raw_code/analysis/prep_standardize.py \\
-  --faers-in data/faers_DRUG.csv --faers-out data/derived/faers_oab_standardized.csv \\
-  --jader-in data/jader_DRUG.csv --jader-out data/derived/jader_oab_standardized.csv
-
-# Rebuild all public figures (Fig.2–6)
-python raw_code/analysis/make_figures.py --prep
+conda env create -f environment.yml
+conda activate oab-af-srs
 ```
 
-**Outputs** are written to `docs/` by default, with one file per figure.
+Or pip:
 
-- Fig.2 → `docs/figure2_forest_plot.(png|tif)`  
-- Fig.3 → `docs/figure3_forest_plot.png`  
-- Fig.4 → `docs/volcano_<drug>.png`  
-- Fig.5 → `docs/figure5_tto_<DB>_<drug>.png`  
-- Fig.6 → `docs/figure6_km_raw.png`
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-> Windows note: we set a sans-serif fallback (DejaVu Sans → Arial/Segoe) to ensure the ✓ glyph renders correctly.
+> We rely on `numpy`, `pandas`, `matplotlib`, `scipy`. All figure scripts are pure-Python and have **no hard dependency** on MSIP (MSIP-specific utilities are optional fallbacks).
 
-## Data interfaces & mapping
+### 2) Reproduce figures
 
-- **How to reproduce (step-by-step)**: see `docs/REPRO_INSTRUCTIONS.md`  
-- **Figure ⇄ Table ⇄ Script map**: see `docs/FIGURE_TABLE_MAP.md`
+From repo root:
 
-All public CSVs use **ASCII-only headers** (e.g., `chi2`, `p_value`). Rows with **`n11 < 3`** are excluded before metrics/plots.  
-Supplementary items: S1–S5 as described in the manuscript and `docs/`.
+```bash
+# (Optional) discover inputs & standardize (if you have raw FAERS/JADER)
+python raw_code/analysis/make_figures.py --prep
 
-## Environment options
+# Regenerate all figures from data/derived (no raw data required)
+python raw_code/analysis/make_figures.py
+```
 
-- **pip**: `requirements.txt` (minimal, upper-bounds-free)  
-- **conda**: `environment.yml` (pins Python + adds system libs for SciPy/Matplotlib)
+Or run any script directly, e.g.:
+
+```bash
+# Fig.2
+python raw_code/plots/forest_plot.py --table data/derived/figure2_source.csv   --out docs/figure2_forest_plot.png --tif docs/figure2_forest_plot.tif
+
+# Fig.3
+python raw_code/plots/forest_plot_multidrug.py --table data/derived/figure3_stratified.csv   --out docs/figure3_forest_plot.png
+
+# Volcano (mirabegron / solifenacin)
+python raw_code/plots/volcano_plot.py --table data/derived/volcano_mirabegron.csv   --out docs/volcano_mirabegron.png --tif docs/volcano_mirabegron.tif --title MIRABEGRON
+python raw_code/plots/volcano_plot.py --table data/derived/volcano_solifenacin.csv   --out docs/volcano_solifenacin.png --tif docs/volcano_solifenacin.tif --title SOLIFENACIN
+
+# Fig.5 (TTO) — 2-year (730 days) view
+python raw_code/plots/figure5_tto_distribution.py --table data/derived/tto_FAERS_mirabegron.csv   --out docs/figure5_tto_FAERS_mirabegron.png --tif docs/figure5_tto_FAERS_mirabegron.tif --ymax 730
+python raw_code/plots/figure5_tto_distribution.py --table data/derived/tto_JADER_solifenacin.csv   --out docs/figure5_tto_JADER_solifenacin.png --tif docs/figure5_tto_JADER_solifenacin.tif --ymax 730
+
+# Fig.6 (KM)
+python raw_code/plots/kaplan_meier_raw.py --table data/derived/figure6_km_source.csv   --out docs/figure6_km_raw.png
+```
+
+---
+
+## Data availability
+
+- **Derived counts & sources** needed to reproduce all disproportionality results are in `data/derived/` and Supplementary Data S1–S4.
+- **FAERS/JADER** case-level data are publicly accessible from their official portals; we do **not** redistribute case-level data here.
+- All scripts required to recompute metrics from the 2×2 counts are provided under `raw_code/`.
+
+---
+
+## Supplementary files mapping
+
+- **S1**: Methods — signal metrics & formulas.
+- **S2**: Source data for Fig. 2.
+- **S3**: Source data for Fig. 3.
+- **S4**: Sensitivity and negative-control analyses.
+- **S5**: Kaplan–Meier curve without 2-year restriction.
+
+See `FIGURE_TABLE_MAP.md` for exact filenames and columns.
+
+---
+
+## License
+
+- **Code**: see `LICENSE` (e.g., MIT).  
+- **Figures/Docs**: unless otherwise noted, © Authors. If you intend to re-use figures, please cite the paper. Optionally apply CC BY 4.0 for figures and docs (add a `LICENSE-media` if desired).
+
+---
 
 ## Citation
 
-Please cite the manuscript once the DOI is available. A machine-readable `CITATION.cff` is included at the repository root.
+A `CITATION.cff` file is included. After acceptance, consider adding a Zenodo DOI.
 
 ---
-*Last updated: 2025-08-21.*
+
+## Contact
+
+Maintainers: Sagara Laboratory — Division of Medical Safety Science, Faculty of Pharmaceutical Sciences  
+<hsagara.laboratory@gmail.com>
