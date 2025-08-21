@@ -1,3 +1,7 @@
+# JADER — PLID build (J_PLID)
+
+_Last updated: 2025-08-21_
+
 # JADER — PLID build
 
 **Purpose**: Assemble patient-level IDs and core fields (sex, age, event_date).  
@@ -12,3 +16,13 @@ SELECT j_id, sex, CAST(age AS INT) AS age, CAST(event_date AS DATE) AS event_dat
 FROM DEMO_J;
 
 ```
+
+---
+## QA checklist
+- [ ] Column names are ASCII-only in public exports (`chi2`, `p_value`).
+- [ ] Date fields parseable (YYYYMMDD/ISO); no future dates; timezone-agnostic.
+- [ ] Null handling documented; duplicated `j_id` rows removed where intended.
+- [ ] Row counts before→after are recorded in MSIP log.
+- [ ] Deterministic ordering (ORDER BY) for reproducible exports.
+
+**Outputs:** J_PLID(j_id, sex, age, event_date, …)

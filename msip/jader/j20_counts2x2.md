@@ -1,3 +1,7 @@
+# JADER — 2×2 counts per drug (J_COUNTS2x2)
+
+_Last updated: 2025-08-21_
+
 # JADER — 2×2 counts per drug
 
 **Purpose**: Build n11, n12, n21, n22 per drug_of_interest.  
@@ -33,3 +37,15 @@ per_drug AS (
 SELECT * FROM per_drug;
 
 ```
+
+---
+## QA checklist
+- [ ] Column names are ASCII-only in public exports (`chi2`, `p_value`).
+- [ ] Date fields parseable (YYYYMMDD/ISO); no future dates; timezone-agnostic.
+- [ ] Null handling documented; duplicated `j_id` rows removed where intended.
+- [ ] Row counts before→after are recorded in MSIP log.
+- [ ] Deterministic ordering (ORDER BY) for reproducible exports.
+
+**Outputs:** J_COUNTS2x2(drug_of_interest, n11, n12, n21, n22, N, n1plus, nplus1)
+**Public export(s):** data/derived/figure2_source.csv
+

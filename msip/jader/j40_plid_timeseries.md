@@ -1,3 +1,7 @@
+# JADER — PLID time-series (J_PLID_TS)
+
+_Last updated: 2025-08-21_
+
 # JADER — PLID time-series (start_date × event_date)
 
 **Purpose**: Build start_date × event_date pairs for AF reports with OAB.  
@@ -35,3 +39,13 @@ JOIN DEMO_STD ds ON ds.j_id = dt.j_id
 JOIN AF_CASES a  ON a.j_id = dt.j_id;
 
 ```
+
+---
+## QA checklist
+- [ ] Column names are ASCII-only in public exports (`chi2`, `p_value`).
+- [ ] Date fields parseable (YYYYMMDD/ISO); no future dates; timezone-agnostic.
+- [ ] Null handling documented; duplicated `j_id` rows removed where intended.
+- [ ] Row counts before→after are recorded in MSIP log.
+- [ ] Deterministic ordering (ORDER BY) for reproducible exports.
+
+**Outputs:** J_PLID_TS(j_id, drug_of_interest, start_date, event_date)

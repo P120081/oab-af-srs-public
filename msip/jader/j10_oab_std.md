@@ -1,3 +1,7 @@
+# JADER — OAB standardize (J_OAB_STD)
+
+_Last updated: 2025-08-21_
+
 # JADER — OAB standardize (OAB_STD)
 
 **Purpose**: Normalize Japanese generic names to ASCII tokens (drug_of_interest).  
@@ -15,3 +19,13 @@ JOIN OAB_NAME_MAP_J m  -- conceptual view produced by Python
   ON m.raw_name_jp = d.一般名;
 
 ```
+
+---
+## QA checklist
+- [ ] Column names are ASCII-only in public exports (`chi2`, `p_value`).
+- [ ] Date fields parseable (YYYYMMDD/ISO); no future dates; timezone-agnostic.
+- [ ] Null handling documented; duplicated `j_id` rows removed where intended.
+- [ ] Row counts before→after are recorded in MSIP log.
+- [ ] Deterministic ordering (ORDER BY) for reproducible exports.
+
+**Outputs:** J_OAB_STD(j_id, drug_of_interest)

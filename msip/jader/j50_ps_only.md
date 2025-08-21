@@ -1,3 +1,7 @@
+# JADER — PS-only PLID (J_PLID_PS)
+
+_Last updated: 2025-08-21_
+
 # JADER — PS-only PLID (role_code == "被疑薬/PS")
 
 **Purpose**: Restrict PLID to suspected-drug rows only.  
@@ -18,3 +22,13 @@ FROM J_PLID p
 JOIN PS USING (j_id);
 
 ```
+
+---
+## QA checklist
+- [ ] Column names are ASCII-only in public exports (`chi2`, `p_value`).
+- [ ] Date fields parseable (YYYYMMDD/ISO); no future dates; timezone-agnostic.
+- [ ] Null handling documented; duplicated `j_id` rows removed where intended.
+- [ ] Row counts before→after are recorded in MSIP log.
+- [ ] Deterministic ordering (ORDER BY) for reproducible exports.
+
+**Outputs:** J_PLID_PS(j_id, …)

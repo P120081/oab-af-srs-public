@@ -1,3 +1,7 @@
+# JADER — Strata base: sex/ageband/poly5 (J_STRATA_BASE)
+
+_Last updated: 2025-08-21_
+
 # JADER — Strata base (sex, ageband, poly5)
 
 **Purpose**: Derive stratification fields from PLID + drug_count.  
@@ -17,3 +21,15 @@ SELECT j_id,
 FROM J_PLID;
 
 ```
+
+---
+## QA checklist
+- [ ] Column names are ASCII-only in public exports (`chi2`, `p_value`).
+- [ ] Date fields parseable (YYYYMMDD/ISO); no future dates; timezone-agnostic.
+- [ ] Null handling documented; duplicated `j_id` rows removed where intended.
+- [ ] Row counts before→after are recorded in MSIP log.
+- [ ] Deterministic ordering (ORDER BY) for reproducible exports.
+
+**Outputs:** J_STRATA_BASE(j_id, sex, ageband, poly5)
+**Public export(s):** data/derived/figure3_stratified.csv (after join)
+

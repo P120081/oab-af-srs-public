@@ -45,11 +45,15 @@ def compute_metrics(table, table1):
         else: p_values_fmt.append(f"{p:.3f}")
 
     # --- ROR (odds ratio) with 95% CI (Woolf; identical to your code) ---
-    ROR = (n11 * n22) / (n12 * n21)
-    se_logROR = np.sqrt(1/n11 + 1/n12 + 1/n21 + 1/n22)
-    logROR = np.log(ROR)
-    ROR025 = np.exp(logROR - 1.96 * se_logROR)
-    ROR975 = np.exp(logROR + 1.96 * se_logROR)
+    with np.errstate(divide="ignore", invalid="ignore"):
+         ROR = (n11 * n22) / (n12 * n21)
+         se_logROR = np.sqrt(1/n11 + 1/n12 + 1/n21 + 1/n22)
+         logROR = np.log(ROR)
+         ROR025 = np.exp(logROR - 1.96 * se_logROR)
+         ROR975 = np.exp(logROR + 1.96 * se_logROR)
+    ROR = np.nan_to_num(ROR, nan=0, posinf=np.inf, neginf=0)
+    ROR025 = np.nan_to_num(ROR025, nan=0, posinf=np.inf, neginf=0)
+    ROR975 = np.nan_to_num(ROR975, nan=0, posinf=np.inf, neginf=0)
 
     # --- PRR with 95% CI (identical to your code) ---
     PRR = (n11 * n2plus) / (n1plus * n21)

@@ -1,23 +1,19 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
-FAERS OAB name standardization (generics only)
+01_oab_standardize.py — FAERS OAB name standardization
 
-Goal
------
-Normalize FAERS DRUG entries to ASCII lowercase tokens for OAB drugs.
+Dual interface:
+  (A) MSIP node: expects a global 'table' and returns msi.DataFrame via pandas_to_dataframe.
+  (B) CLI: read CSV with ['primaryid', ('drug_of_interest' or 'prod_ai')] and write 'primaryid,drug_of_interest'.
 
-Inputs (table must contain 'primaryid' and either column below):
-- 'drug_of_interest' (pre-filled by an upstream step)  OR
-- 'prod_ai' (ingredient text from FAERS DRUG table)
-
-Output
-------
-OAB_STD_F with two columns:
-- primaryid
-- drug_of_interest   # ASCII lowercase: oxybutynin, propiverine, solifenacin,
-                     # imidafenacin, tolterodine, fesoterodine, mirabegron, vibegron
+Usage (CLI):
+  python raw_code/faers/01_oab_standardize.py \
+    --in data/faers_DRUG.csv \
+    --out data/derived/faers_oab_standardized.csv
 """
-
-from msi.common.dataframe import pandas_to_dataframe
+import argparse, sys, unicodedata
 import pandas as pd
 
 # canonical OAB tokens to search (lowercase)
@@ -32,35 +28,63 @@ GENERIC_TOKENS = [
     "vibegron",
 ]
 
+def _normalize_text(s: str) -> str:
+    if not isinstance(s, str):
+        s = "" if pd.isna(s) else str(s)
+    s = unicodedata.normalize("NFKC", s)  # normalize half/full width
+    return s.strip().lower()
+
+def _map_token(txt: str):
+    s = _normalize_text(txt)
+    for tok in GENERIC_TOKENS:
+        if tok in s:
+            return tok
+    return None
+
+def _standardize_df(df: pd.DataFrame) -> pd.DataFrame:
+    if "primaryid" not in df.columns:
+        raise ValueError("Input must contain 'primaryid'")
+    # choose source column
+    src_col = None
+    for c in ["drug_of_interest","prod_ai"]:
+        if c in df.columns:
+            src_col = c; break
+    if src_col is None:
+        raise ValueError("Input must contain 'drug_of_interest' or 'prod_ai'")
+    tmp = df.loc[df["primaryid"].notna() & df[src_col].notna(), ["primaryid", src_col]].copy()
+    tmp["drug_of_interest"] = tmp[src_col].map(_map_token)
+    out = (tmp.loc[tmp["drug_of_interest"].notna(), ["primaryid","drug_of_interest"]]
+             .drop_duplicates()
+             .reset_index(drop=True))
+    return out
+
+# ---- MSIP entrypoint ----
 def standardize_oab_faers(table) -> "msi.DataFrame":
+    """MSIP node entrypoint: input is msi.DataFrame, output the same type."""
+    from msi.common.dataframe import pandas_to_dataframe
     df = table.to_pandas().copy()
-    # keep rows with a valid primaryid
-    df = df[df["primaryid"].notna()]
-
-    # choose the source text to normalize
-    if "drug_of_interest" in df.columns:
-        src = df["drug_of_interest"].astype(str).str.lower()
-    elif "prod_ai" in df.columns:
-        src = df["prod_ai"].astype(str).str.lower()
-    else:
-        # no usable source column; return empty schema
-        empty = pd.DataFrame(columns=["primaryid", "drug_of_interest"])
-        return pandas_to_dataframe(empty)
-
-    # map any substring hit to the canonical lowercase token
-    def to_token(txt: str):
-        for tok in GENERIC_TOKENS:
-            if tok in txt:
-                return tok
-        return None
-
-    df["drug_of_interest"] = src.map(to_token)
-
-    out = (
-        df.loc[df["drug_of_interest"].notna(), ["primaryid", "drug_of_interest"]]
-          .drop_duplicates()
-    )
+    out = _standardize_df(df)
     return pandas_to_dataframe(out)
 
-# In MSIP, set:
-# result = standardize_oab_faers(table)
+# ---- CLI ----
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--in",  dest="inp",  required=False, help="Input CSV (FAERS DRUG)")
+    ap.add_argument("--out", dest="outp", required=False, help="Output CSV [primaryid,drug_of_interest]")
+    args = ap.parse_args()
+
+    if args.inp is None and "table" in globals():
+        out = standardize_oab_faers(globals()["table"])
+        print(out)
+        return
+
+    if args.inp is None or args.outp is None:
+        ap.error("CLI mode requires --in and --out")
+
+    df = pd.read_csv(args.inp)
+    out = _standardize_df(df)
+    out.to_csv(args.outp, index=False, encoding="utf-8")
+    print(f"[01_oab_standardize_FAERS] wrote {len(out):,} rows -> {args.outp}")
+
+if __name__ == "__main__":
+    main()

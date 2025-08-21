@@ -1,3 +1,7 @@
+# JADER — AF extract (J_AF)
+
+_Last updated: 2025-08-21_
+
 # JADER — AF extract (AF)
 
 **Purpose**: Identify AF cases from REAC.  
@@ -13,3 +17,13 @@ FROM REAC_J
 WHERE 有害事象 = '心房細動';
 
 ```
+
+---
+## QA checklist
+- [ ] Column names are ASCII-only in public exports (`chi2`, `p_value`).
+- [ ] Date fields parseable (YYYYMMDD/ISO); no future dates; timezone-agnostic.
+- [ ] Null handling documented; duplicated `j_id` rows removed where intended.
+- [ ] Row counts before→after are recorded in MSIP log.
+- [ ] Deterministic ordering (ORDER BY) for reproducible exports.
+
+**Outputs:** J_AF(j_id)
