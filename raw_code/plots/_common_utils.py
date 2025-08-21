@@ -15,7 +15,7 @@ def load_table_like(path_or_df, expected=None, prefer_numeric_p=True):
     """
     Load a pandas DataFrame from either:
       - MSIP 'table' object (already DataFrame-like), or
-      - CSV file path
+      - CSV path / DataFrame
     Normalize common columns to ASCII names used publicly.
     """
     if hasattr(path_or_df, "to_pandas"):  # MSIP table
@@ -27,15 +27,14 @@ def load_table_like(path_or_df, expected=None, prefer_numeric_p=True):
 
     # normalize header variants
     rename = {}
-    cols = list(df.columns)
     # p-value variants
     if "p" not in df.columns:
-        for cand in ["p-value", "p value", "P", "P-value", "P value"]:
+        for cand in ["p_value","p-value","p value","P","P-value","P value"]:
             if cand in df.columns:
                 rename[cand] = "p"
                 break
     # chi2 variants
-    for cand in ["χ^2", "χ²", "chi^2", "x2", "X2"]:
+    for cand in ["χ^2","χ²","chi^2","x2","X2"]:
         if cand in df.columns:
             rename[cand] = "chi2"
             break

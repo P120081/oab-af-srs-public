@@ -11,11 +11,11 @@ date-released: "2025-08-21"
 repository-code: "https://github.com/P120081/oab-af-srs-public"
 preferred-citation:
   type: article
-  title: "Association between OAB pharmacotherapy and atrial fibrillation in FAERS/JADER"
+  title: "Atrial Fibrillation Signals with Overactive Bladder Drugs across JADER and FAERS: Disproportionality and Time-to-Onset Analyses"
   # Replace the following fields upon acceptance:
   authors:
-    - family-names: "Sagara"
-      given-names: "H."
+    - family-names: "Nagura"
+      given-names: "Kyosuke"
   journal: "Frontiers in Pharmacology"
   year: 2025
   doi: "10.XXXX/fphar.XXXXXXX"

@@ -1,16 +1,10 @@
 
 #!/usr/bin/env python3
-"""
-Forest plot (multi-drug grouping).
-Dual mode (MSIP / CLI).
-CLI example:
-  python raw_code/plots/forest_plot_multidrug.py --table data/derived/figure3_stratified.csv --out docs/figure2_forest_plot_multidrug.png
-"""
-import os, argparse, numpy as np, pandas as pd, matplotlib.pyplot as plt
+import numpy as np, pandas as pd, matplotlib.pyplot as plt
 from _common_utils import OKABE_ITO, load_table_like
 
-plt.rcParams['font.family'] = 'Arial'
-plt.rcParams['axes.axisbelow'] = True
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.sans-serif'] = ['DejaVu Sans','Arial','Segoe UI','Helvetica']
 
 def draw_panel(ax, subdf, title):
     xmax = max(20.0, float(subdf["ROR975"].max(skipna=True)) * 1.5)
@@ -50,16 +44,12 @@ def forest_multidrug(df: pd.DataFrame, out_png: str):
     plt.savefig(out_png, dpi=300); plt.close()
 
 def main():
+    import argparse
     ap = argparse.ArgumentParser()
-    ap.add_argument("--table", required=False, help="CSV with stratified rows")
-    ap.add_argument("--out",   required=False, default="figure2_forest_plot_multidrug.png")
+    ap.add_argument("--table", required=False)
+    ap.add_argument("--out",   required=False, default="figure3_forest_plot.png")
     args = ap.parse_args()
-
-    if args.table is None and "table" in globals():
-        df = load_table_like(globals()["table"])
-    else:
-        df = load_table_like(args.table)
-
+    df = load_table_like(globals()["table"] if args.table is None and "table" in globals() else args.table)
     forest_multidrug(df, out_png=args.out)
 
 if __name__ == "__main__":

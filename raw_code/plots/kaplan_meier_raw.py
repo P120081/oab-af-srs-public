@@ -1,16 +1,11 @@
 
 #!/usr/bin/env python3
-"""
-KM-style cumulative curve (raw TTO).
-Draws 4 curves: JADER/FAERS x MIRABEGRON/SOLIFENACIN by default.
-CLI:
-  python raw_code/plots/kaplan_meier_raw.py --table data/derived/figure6_km_source.csv --out docs/figure6_km_raw.png
-"""
-import os, argparse, numpy as np, pandas as pd, matplotlib.pyplot as plt
+import numpy as np, pandas as pd, matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from _common_utils import OKABE_ITO, load_table_like
 
-plt.rcParams["font.family"] = "Arial"
+plt.rcParams["font.family"] = "sans-serif"
+plt.rcParams['font.sans-serif'] = ['DejaVu Sans','Arial','Segoe UI','Helvetica']
 plt.rcParams["font.size"]   = 12
 
 MM_TO_INCH = 1.0 / 25.4
@@ -40,10 +35,10 @@ def km_raw(df: pd.DataFrame, out_png: str, drugs=("MIRABEGRON","SOLIFENACIN")):
 
     fig, ax = plt.subplots(figsize=(FIG_W, FIG_H))
     groups = [
-        ("FAERS", drugs[0],  OKABE_ITO["SkyBlue"], "-."),
-        ("FAERS", drugs[1],  OKABE_ITO["SkyBlue"], "-"),
-        ("JADER", drugs[0],  OKABE_ITO["Orange"],  "-."),
-        ("JADER", drugs[1],  OKABE_ITO["Orange"],  "-"),
+        ("FAERS", drugs[0],  "#56B4E9", "-."),
+        ("FAERS", drugs[1],  "#56B4E9", "-"),
+        ("JADER", drugs[0],  "#E69F00",  "-."),
+        ("JADER", drugs[1],  "#E69F00",  "-"),
     ]
     any_curve = False
     for db_val, drug_val, color, lstyle in groups:
@@ -72,18 +67,15 @@ def km_raw(df: pd.DataFrame, out_png: str, drugs=("MIRABEGRON","SOLIFENACIN")):
     plt.tight_layout(); plt.savefig(out_png, dpi=300, format="png", transparent=False); plt.close()
 
 def main():
+    import argparse
     ap = argparse.ArgumentParser()
-    ap.add_argument("--table", required=False, help="CSV with columns [DB,prod_ai,TTO]")
+    ap.add_argument("--table", required=False)
     ap.add_argument("--out",   required=False, default="figure6_km_raw.png")
     ap.add_argument("--drugA", required=False, default="MIRABEGRON")
     ap.add_argument("--drugB", required=False, default="SOLIFENACIN")
     args = ap.parse_args()
 
-    if args.table is None and "table" in globals():
-        df = load_table_like(globals()["table"])
-    else:
-        df = load_table_like(args.table)
-
+    df = load_table_like(globals()["table"] if args.table is None and "table" in globals() else args.table)
     km_raw(df, out_png=args.out, drugs=(args.drugA.upper(), args.drugB.upper()))
 
 if __name__ == "__main__":
