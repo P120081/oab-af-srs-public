@@ -136,4 +136,4 @@ A `CITATION.cff` file is included. After acceptance, consider adding a Zenodo DO
 ## Contact
 
 Maintainers: Sagara Laboratory — Division of Medical Safety Science, Faculty of Pharmaceutical Sciences  
-<hsagara.laboratory@gmail.com>
+<>
