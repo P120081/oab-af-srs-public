@@ -1,21 +1,73 @@
 cff-version: 1.2.0
-message: "If you use this repository, please cite the following work."
+message: "If you use this repository, please cite both the software and the article."
 title: "OAB–AF signal detection using spontaneous reporting systems (reproducibility package)"
-authors:
-  - family-names: ""
-    given-names: ""
-  # Add all authors here
 type: software
 version: "1.0.0"
-date-released: "2025-08-21"
+date-released: "2025-09-07"
+license: MIT
 repository-code: "https://github.com/P120081/oab-af-srs-public"
+keywords:
+  - pharmacovigilance
+  - FAERS
+  - JADER
+  - overactive bladder
+  - atrial fibrillation
+  - disproportionality
+  - time-to-onset
+  - Weibull
+  - Kaplan-Meier
+
+# Author order follows the manuscript
+authors:
+  - family-names: "Nagura"
+    given-names: "Kyosuke"
+    affiliation: "Division of Medical Safety Science, Faculty of Pharmaceutical Sciences, Sanyo-Onoda city University, Sanyo-Onoda, Japan"
+  - family-names: "Watanabe"
+    given-names: "Satoko"
+    affiliation: "Division of Medical Safety Science, Faculty of Pharmaceutical Sciences, Sanyo-Onoda city University, Sanyo-Onoda, Japan"
+  - family-names: "Hamano"
+    given-names: "Hirofumi"
+    affiliation: "Department of Pharmacy, Okayama University Hospital, Okayama, Japan"
+  - family-names: "Zamami"
+    given-names: "Yoshito"
+    affiliation: "Department of Pharmacy, Okayama University Hospital, Okayama, Japan"
+  - family-names: "Watanabe"
+    given-names: "Taro"
+    affiliation: "Department of Pharmacy, Yamaguchi Prefectural Grand Medical Center, Hofu, Japan; Division of Medical Safety Science, Graduate School of Pharmaceutical Sciences, Sanyo-Onoda city University, Sanyo-Onoda, Japan"
+  - family-names: "Sagara"
+    given-names: "Hidenori"
+    affiliation: "Division of Medical Safety Science, Faculty of Pharmaceutical Sciences, Sanyo-Onoda city University, Sanyo-Onoda, Japan; Division of Medical Safety Science, Graduate School of Pharmaceutical Sciences, Sanyo-Onoda city University, Sanyo-Onoda, Japan"
+
+# Corresponding author for this software package / manuscript
+contact:
+  - family-names: "Sagara"
+    given-names: "Hidenori"
+    affiliation: "Division of Medical Safety Science, Faculty of Pharmaceutical Sciences, Sanyo-Onoda city University, Sanyo-Onoda, Japan; Division of Medical Safety Science, Graduate School of Pharmaceutical Sciences, Sanyo-Onoda city University, Sanyo-Onoda, Japan"
+    email: "hsagara@rs.socu.ac.jp"
+
 preferred-citation:
   type: article
-  title: "Atrial Fibrillation Signals with Overactive Bladder Drugs across JADER and FAERS: Disproportionality and Time-to-Onset Analyses"
-  # Replace the following fields upon acceptance:
+  title: "Atrial Fibrillation Signals with Overactive Bladder Drugs from JADER and FAERS: Disproportionality and Time-to-Onset Analyses"
   authors:
-    - family-names: ""
-      given-names: ""
+    - family-names: "Nagura"
+      given-names: "Kyosuke"
+      affiliation: "Division of Medical Safety Science, Faculty of Pharmaceutical Sciences, Sanyo-Onoda city University, Sanyo-Onoda, Japan"
+    - family-names: "Watanabe"
+      given-names: "Satoko"
+      affiliation: "Division of Medical Safety Science, Faculty of Pharmaceutical Sciences, Sanyo-Onoda city University, Sanyo-Onoda, Japan"
+    - family-names: "Hamano"
+      given-names: "Hirofumi"
+      affiliation: "Department of Pharmacy, Okayama University Hospital, Okayama, Japan"
+    - family-names: "Zamami"
+      given-names: "Yoshito"
+      affiliation: "Department of Pharmacy, Okayama University Hospital, Okayama, Japan"
+    - family-names: "Watanabe"
+      given-names: "Taro"
+      affiliation: "Department of Pharmacy, Yamaguchi Prefectural Grand Medical Center, Hofu, Japan; Division of Medical Safety Science, Graduate School of Pharmaceutical Sciences, Sanyo-Onoda city University, Sanyo-Onoda, Japan"
+    - family-names: "Sagara"
+      given-names: "Hidenori"
+      affiliation: "Division of Medical Safety Science, Faculty of Pharmaceutical Sciences, Sanyo-Onoda city University, Sanyo-Onoda, Japan; Division of Medical Safety Science, Graduate School of Pharmaceutical Sciences, Sanyo-Onoda city University, Sanyo-Onoda, Japan"
+      email: "hsagara@rs.socu.ac.jp"
   journal: "Frontiers in Pharmacology"
   year: 2025
   doi: "10.XXXX/fphar.XXXXXXX"
