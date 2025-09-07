@@ -1,6 +1,8 @@
-# Reproduction Instructions (Final)
+# Reproduction Instructions (Updated)
 
-This is the authoritative, step-by-step guide to regenerate every artifact.
+This update keeps the content identical to your current **Reproduction Instructions (Final)**, with one small alignment:
+- **Fig.5 examples now pass `--ymax 730`**, matching the manuscript figure and the docs page.
+  (The plotting script defaults to 2750; using `--ymax 730` ensures consistent outputs.)
 
 ## 0) Environment
 ```powershell
@@ -41,13 +43,13 @@ python raw_code/plots/volcano_plot.py --table data/derived/volcano_solifenacin.c
   --out docs/volcano_solifenacin.png --tif docs/volcano_solifenacin.tif --title SOLIFENACIN
 ```
 
-### Fig.5 (TTO, y=0–730)
+### Fig.5 (TTO, **y=0–730**)
 ```powershell
 python raw_code/plots/figure5_tto_distribution.py --table data/derived/tto_FAERS_mirabegron.csv `
-  --out docs/figure5_tto_FAERS_mirabegron.png --tif docs/figure5_tto_FAERS_mirabegron.tif
+  --out docs/figure5_tto_FAERS_mirabegron.png --tif docs/figure5_tto_FAERS_mirabegron.tif --ymax 730
 
 python raw_code/plots/figure5_tto_distribution.py --table data/derived/tto_JADER_solifenacin.csv `
-  --out docs/figure5_tto_JADER_solifenacin.png --tif docs/figure5_tto_JADER_solifenacin.tif
+  --out docs/figure5_tto_JADER_solifenacin.png --tif docs/figure5_tto_JADER_solifenacin.tif --ymax 730
 ```
 
 ### Fig.6 (KM, raw)
@@ -71,3 +73,5 @@ python raw_code/plots/kaplan_meier_raw.py --table data/derived/figure6_km_source
 - Keep generated figures under `docs/` (OK to include in the repo).  
 - If file sizes are large, prefer GitHub Releases or Git LFS for `.tif`.  
 - Ensure `DATA_INTERFACES.md` and this file travel with the release tag.
+
+_Last updated: 2025-09-07._
