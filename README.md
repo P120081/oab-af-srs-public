@@ -43,14 +43,20 @@ Or pip:
 
 ```bash
 python -m venv .venv
-# macOS/Linux
+
+# macOS / Linux
 source .venv/bin/activate
+
 # Windows (PowerShell)
-.venv\Scripts\Activate.ps1
+.\.venv\Scripts\Activate.ps1
+
+# Windows (cmd.exe)
+.venv\Scriptsctivate.bat
+
 pip install -r requirements.txt
 ```
 
-> We rely on `numpy`, `pandas`, `matplotlib`, `scipy`. All figure scripts are pure-Python and have **no hard dependency** on MSIP (MSIP-specific utilities are optional fallbacks).
+> We rely on `numpy`, `pandas`, `matplotlib`, `scipy`, **`joblib`** (bootstrap parallelism), and **`lifelines`** (survival utilities). All figure scripts are pure-Python and have **no hard dependency** on MSIP (MSIP-specific utilities are optional fallbacks).
 
 ### 2) Reproduce figures
 
@@ -71,7 +77,7 @@ Or run any script directly, e.g.:
 python raw_code/plots/forest_plot.py --table data/derived/figure2_source.csv   --out docs/figure2_forest_plot.png --tif docs/figure2_forest_plot.tif
 
 # Fig.3
-python raw_code/plots/forest_plot_multidrug.py --table data/derived/figure3_stratified.csv   --out docs/figure3_forest_plot.png
+python raw_code/plots/forest_plot_multidrug.py --table data/derived/figure3_stratified.csv   --out docs/figure3_forest_plot.png --tif docs/figure3_forest_plot.tif
 
 # Volcano (mirabegron / solifenacin)
 python raw_code/plots/volcano_plot.py --table data/derived/volcano_mirabegron.csv   --out docs/volcano_mirabegron.png --tif docs/volcano_mirabegron.tif --title MIRABEGRON
@@ -94,6 +100,8 @@ python raw_code/plots/forest_plot.py `
   --tif docs/figure2_forest_plot.tif
 ```
 
+> **Tip (CI/smoke):** For Fig.5 you can speed up bootstrap by adding `--B 2000` for a quick check; the manuscript build uses `--B 10000`.
+
 ---
 
 ## Data availability
@@ -104,7 +112,7 @@ python raw_code/plots/forest_plot.py `
 
 **Notes for CSV headers**
 
-- Public CSVs favor ASCII headers (`p_value`, `chi2`). Plot scripts are tolerant to `p`, `p-value`, or scientific notation like `5.54E-18` (converted to float then `-log10(p)`).
+- Public CSVs favor ASCII headers (`p_value`, `chi2`). Plot scripts are tolerant to `p`, `p-value`, and scientific notation like `5.54E-18` (converted to float then `-log10(p)`).
 
 ---
 
@@ -120,20 +128,21 @@ See `FIGURE_TABLE_MAP.md` for exact filenames and columns.
 
 ---
 
-## License
+## Version & citation
 
-- **Code**: see `LICENSE` (e.g., MIT).  
-- **Figures/Docs**: unless otherwise noted, © Authors. If you intend to re-use figures, please cite the paper. Optionally apply CC BY 4.0 for figures and docs (add a `LICENSE-media` if desired).
+- Latest tagged release: **v1.0.0** (public peer‑review package).  
+- A `CITATION.cff` file is included. After acceptance, consider adding a Zenodo DOI (and list it under `identifiers`).
 
 ---
 
-## Citation
+## License
 
-A `CITATION.cff` file is included. After acceptance, consider adding a Zenodo DOI.
+- **Code**: see `LICENSE` (MIT).  
+- **Figures/Docs**: unless otherwise noted, © Authors. If you intend to re-use figures, please cite the paper. Optionally apply CC BY 4.0 for figures and docs (add a `LICENSE-media` if desired).
 
 ---
 
 ## Contact
 
-Maintainers: Sagara Laboratory — Division of Medical Safety Science, Faculty of Pharmaceutical Sciences  
-<>
+Maintainers: **Sagara Laboratory** — Division of Medical Safety Science, Faculty of Pharmaceutical Sciences, Sanyo‑Onoda city University  
+Contact: **Hidenori Sagara** — hsagara@rs.socu.ac.jp
