@@ -7,15 +7,14 @@ date-released: "2025-09-07"
 license: MIT
 repository-code: "https://github.com/P120081/oab-af-srs-public"
 keywords:
-  - pharmacovigilance
   - FAERS
   - JADER
-  - overactive bladder
-  - atrial fibrillation
-  - disproportionality
+  - disproportionality analysis
   - time-to-onset
-  - Weibull
-  - Kaplan-Meier
+  - pharmacovigilance
+  - atrial fibrillation
+  - mirabegron
+  - solifenacin
 
 # Author order follows the manuscript
 authors:
